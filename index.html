@@ -1,0 +1,743 @@
+<!DOCTYPE html>
+<html lang="so" dir="ltr">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no">
+    <title>Nidaamka Iibka - Shaqaalaha</title>
+    <script src="https://cdn.tailwindcss.com"></script>
+    <script src="https://kit.fontawesome.com/0ef458b5b5.js" crossorigin="anonymous"></script>
+    <style>
+        @import url('https://fonts.googleapis.com/css2?family=Inter:wght@300;400;500;600;700;800&display=swap');
+        body { font-family: 'Inter', sans-serif; background-color: #f8fafc; }
+        input:focus, select:focus, textarea:focus { outline: none; border-color: #4f46e5; box-shadow: 0 0 0 4px rgba(79, 70, 229, 0.15); }
+        
+        /* Smooth Scrollbar */
+        ::-webkit-scrollbar { width: 6px; height: 6px; }
+        ::-webkit-scrollbar-track { background: transparent; }
+        ::-webkit-scrollbar-thumb { background: #cbd5e1; border-radius: 10px; }
+        ::-webkit-scrollbar-thumb:hover { background: #94a3b8; }
+
+        .tab-content { display: none; animation: slideUp 0.4s cubic-bezier(0.16, 1, 0.3, 1); }
+        .tab-content.active { display: block; }
+        @keyframes slideUp { from { opacity: 0; transform: translateY(15px); } to { opacity: 1; transform: translateY(0); } }
+
+        /* Modern Bottom Nav Active State */
+        .nav-btn.active { color: #4f46e5; }
+        .nav-btn.active i { transform: scale(1.15) translateY(-2px); transition: all 0.3s cubic-bezier(0.34, 1.56, 0.64, 1); text-shadow: 0 4px 10px rgba(79, 70, 229, 0.3); }
+        
+        /* Glassmorphism utility */
+        .glass { background: rgba(255, 255, 255, 0.85); backdrop-filter: blur(12px); -webkit-backdrop-filter: blur(12px); border: 1px solid rgba(255, 255, 255, 0.3); }
+    </style>
+</head>
+<body class="text-slate-800 h-screen overflow-hidden flex flex-col md:flex-row bg-slate-50">
+
+    <div id="loginScreen" class="fixed inset-0 bg-slate-50 z-50 flex items-center justify-center p-4 overflow-y-auto">
+        <div class="max-w-md w-full glass rounded-[2.5rem] shadow-[0_20px_50px_rgba(0,0,0,0.1)] p-8 border border-white">
+            <div class="text-center mb-8">
+                <div class="bg-gradient-to-tr from-indigo-600 to-blue-500 text-white w-24 h-24 rounded-3xl flex items-center justify-center mx-auto mb-6 text-5xl shadow-xl shadow-indigo-200 transform rotate-3 transition hover:rotate-6">
+                    <i class="fa-solid fa-store"></i>
+                </div>
+                <h1 class="text-3xl font-extrabold text-slate-900 mb-2 tracking-tight">Ku Soo Dhawaaw</h1>
+                <p class="text-slate-500 font-medium">Geli xogtaada si aad u bilowdo shaqada</p>
+            </div>
+
+            <form id="loginForm" class="space-y-5">
+                <div>
+                    <label class="block text-sm font-bold text-slate-700 mb-2 uppercase tracking-wide">Magacaaga</label>
+                    <input type="text" id="loginName" required placeholder="Magaca oo saddexan" 
+                           class="w-full text-lg px-5 py-4 rounded-2xl border-2 border-slate-100 bg-white transition shadow-sm hover:border-slate-200">
+                </div>
+
+                <div>
+                    <label class="block text-sm font-bold text-slate-700 mb-2 uppercase tracking-wide">Dooro Laanta</label>
+                    <div class="relative">
+                        <select id="loginBranch" required 
+                                class="w-full text-lg px-5 py-4 rounded-2xl border-2 border-slate-100 bg-white transition shadow-sm hover:border-slate-200 appearance-none cursor-pointer">
+                            <option value="" disabled selected>Wuu soo dacayaa...</option>
+                        </select>
+                        <i class="fa-solid fa-chevron-down absolute right-5 top-1/2 transform -translate-y-1/2 text-slate-400"></i>
+                    </div>
+                </div>
+
+                <div>
+                    <label class="block text-sm font-bold text-slate-700 mb-2 uppercase tracking-wide">Password-ka</label>
+                    <input type="password" id="loginPassword" required placeholder="Geli lambarka sirta ah" 
+                           class="w-full text-lg px-5 py-4 rounded-2xl border-2 border-slate-100 bg-white transition shadow-sm hover:border-slate-200">
+                </div>
+
+                <button type="submit" id="loginBtn" disabled
+                        class="w-full bg-slate-900 hover:bg-indigo-600 disabled:bg-slate-300 text-white text-lg font-bold py-4 rounded-2xl shadow-lg transition-all duration-300 transform hover:-translate-y-1 mt-6">
+                    Gal Nidaamka <i class="fa-solid fa-arrow-right ml-2"></i>
+                </button>
+            </form>
+        </div>
+    </div>
+
+    <nav class="hidden md:flex flex-col w-72 bg-white border-r border-slate-100 h-full shadow-[4px_0_24px_rgba(0,0,0,0.02)] z-40">
+        <div class="p-8 border-b border-slate-50 flex items-center gap-4">
+            <div class="bg-indigo-600 text-white p-3.5 rounded-2xl text-2xl shadow-lg shadow-indigo-200"><i class="fa-solid fa-store"></i></div>
+            <div>
+                <h2 class="text-xl font-extrabold text-slate-900 tracking-tight">Nidaamka Iibka</h2>
+                <p class="text-sm font-semibold text-indigo-500" id="sidebarBranchName">Laanta...</p>
+            </div>
+        </div>
+        <div class="flex-1 p-5 space-y-2 overflow-y-auto">
+            <button onclick="switchTab('dashboard')" class="nav-btn w-full flex items-center gap-4 px-5 py-4 rounded-2xl text-[15px] font-bold text-slate-500 hover:bg-indigo-50 hover:text-indigo-600 transition-all" data-target="dashboard">
+                <i class="fa-solid fa-border-all text-xl w-6"></i> Xogta Guud
+            </button>
+            <button onclick="switchTab('add-sale')" class="nav-btn w-full flex items-center gap-4 px-5 py-4 rounded-2xl text-[15px] font-bold text-slate-500 hover:bg-indigo-50 hover:text-indigo-600 transition-all" data-target="add-sale">
+                <i class="fa-solid fa-cart-plus text-xl w-6"></i> Diiwaangeli Iib
+            </button>
+            <button onclick="switchTab('report')" class="nav-btn w-full flex items-center gap-4 px-5 py-4 rounded-2xl text-[15px] font-bold text-slate-500 hover:bg-indigo-50 hover:text-indigo-600 transition-all" data-target="report">
+                <i class="fa-solid fa-chart-pie text-xl w-6"></i> Warbixin & Raadin
+            </button>
+            <button onclick="switchTab('profile')" class="nav-btn w-full flex items-center gap-4 px-5 py-4 rounded-2xl text-[15px] font-bold text-slate-500 hover:bg-indigo-50 hover:text-indigo-600 transition-all" data-target="profile">
+                <i class="fa-solid fa-user-gear text-xl w-6"></i> Xogtayda
+            </button>
+            <button onclick="switchTab('about')" class="nav-btn w-full flex items-center gap-4 px-5 py-4 rounded-2xl text-[15px] font-bold text-slate-500 hover:bg-indigo-50 hover:text-indigo-600 transition-all" data-target="about">
+                <i class="fa-solid fa-circle-info text-xl w-6"></i> Ku Saabsan
+            </button>
+        </div>
+        <div class="p-5 border-t border-slate-50">
+            <div class="bg-slate-50 rounded-2xl p-4 flex items-center justify-between mb-4 border border-slate-100">
+                <div class="flex items-center gap-3">
+                    <div class="w-10 h-10 rounded-full bg-indigo-100 flex items-center justify-center text-indigo-600 font-bold"><i class="fa-solid fa-user-tie"></i></div>
+                    <div class="overflow-hidden">
+                        <p class="text-sm font-bold text-slate-900 truncate" id="sidebarStaffName">Magaca</p>
+                        <p class="text-xs font-semibold text-slate-400 uppercase tracking-wider">Shaqaale</p>
+                    </div>
+                </div>
+            </div>
+            <button onclick="logout()" class="w-full py-3.5 rounded-2xl bg-red-50 text-red-600 font-bold hover:bg-red-100 transition flex items-center justify-center gap-2">
+                <i class="fa-solid fa-power-off"></i> Ka Bax
+            </button>
+        </div>
+    </nav>
+
+    <main class="flex-1 flex flex-col h-full bg-slate-50 overflow-hidden relative pb-28 md:pb-0">
+        
+        <header class="md:hidden glass px-5 py-4 flex items-center justify-between z-30 sticky top-0">
+            <div class="flex items-center gap-3">
+                <div class="bg-indigo-600 text-white p-2.5 rounded-xl text-lg shadow-md"><i class="fa-solid fa-store"></i></div>
+                <div>
+                    <h1 class="text-lg font-extrabold text-slate-900 leading-tight tracking-tight" id="mobileTitle">Xogta Guud</h1>
+                    <p class="text-[11px] uppercase tracking-wider text-indigo-600 font-bold" id="mobileBranchName">Laanta</p>
+                </div>
+            </div>
+            <button onclick="logout()" class="w-10 h-10 rounded-full bg-red-50 text-red-500 flex items-center justify-center text-lg hover:bg-red-100 transition"><i class="fa-solid fa-right-from-bracket"></i></button>
+        </header>
+
+        <div class="flex-1 overflow-y-auto p-4 md:p-8 w-full max-w-7xl mx-auto">
+            
+            <div id="dashboard" class="tab-content active space-y-6 md:space-y-8">
+                <h2 class="text-2xl md:text-3xl font-extrabold text-slate-900 hidden md:block tracking-tight">Soo dhawoow, <span id="dashStaffName" class="text-indigo-600"></span> <i class="fa-solid fa-hand-wave text-yellow-500 ml-1"></i></h2>
+                
+                <div class="grid grid-cols-1 md:grid-cols-2 gap-4 md:gap-6">
+                    <div class="bg-gradient-to-br from-indigo-600 via-indigo-500 to-blue-500 rounded-[2rem] p-8 shadow-xl shadow-indigo-200 text-white relative overflow-hidden">
+                        <div class="absolute top-0 right-0 w-32 h-32 bg-white opacity-10 rounded-full -mr-10 -mt-10 blur-2xl"></div>
+                        <i class="fa-solid fa-sack-dollar absolute -right-4 -bottom-4 text-8xl opacity-20 transform -rotate-12"></i>
+                        <h3 class="text-indigo-100 text-sm font-bold uppercase tracking-widest mb-2">Iibka Maanta (Wadarta)</h3>
+                        <div class="text-4xl md:text-6xl font-black mt-1 tracking-tighter flex items-center">
+                            <span class="text-indigo-200 text-3xl md:text-4xl mr-1">$</span><span id="dashTodayTotal">0.00</span>
+                        </div>
+                    </div>
+                    
+                    <div class="bg-white rounded-[2rem] p-8 shadow-sm border border-slate-100 flex items-center justify-between">
+                        <div>
+                            <h3 class="text-slate-400 text-sm font-bold uppercase tracking-widest mb-2">Tirada Macaamiisha</h3>
+                            <div class="text-4xl md:text-5xl font-black text-slate-900 tracking-tighter" id="dashTodayCount">0</div>
+                        </div>
+                        <div class="w-20 h-20 rounded-[1.5rem] bg-emerald-50 text-emerald-500 flex items-center justify-center text-4xl shadow-sm">
+                            <i class="fa-solid fa-users"></i>
+                        </div>
+                    </div>
+                </div>
+
+                <div class="bg-white rounded-[2rem] shadow-sm border border-slate-100 p-6 md:p-8">
+                    <div class="flex justify-between items-center mb-6">
+                        <h3 class="text-xl font-extrabold text-slate-900 tracking-tight">Iibkii Ugu Dambeeyay ee Maanta</h3>
+                        <button onclick="switchTab('report')" class="text-indigo-600 font-bold hover:text-indigo-800 bg-indigo-50 px-4 py-2 rounded-xl text-sm transition">Dhammaan <i class="fa-solid fa-arrow-right ml-1"></i></button>
+                    </div>
+                    <div id="recentSalesList" class="space-y-3">
+                        <div class="text-center py-10 text-slate-400"><i class="fa-solid fa-circle-notch fa-spin text-3xl mb-3"></i><p class="font-medium">Waa la soo akhrinayaa...</p></div>
+                    </div>
+                </div>
+            </div>
+
+            <div id="add-sale" class="tab-content">
+                <div class="bg-white rounded-[2.5rem] shadow-sm border border-slate-100 overflow-hidden max-w-4xl mx-auto">
+                    <div class="bg-gradient-to-r from-slate-900 to-slate-800 p-8 md:p-10 text-white relative overflow-hidden">
+                        <i class="fa-solid fa-cart-arrow-down absolute -right-6 -top-6 text-8xl text-white opacity-5"></i>
+                        <h2 class="text-3xl md:text-4xl font-black tracking-tight mb-2">Diiwaangeli Iib Cusub</h2>
+                        <p class="text-slate-400 text-lg font-medium">Si taxadar leh u buuxi xogta badeecada la iibiyay.</p>
+                    </div>
+                    
+                    <form id="salesForm" class="p-6 md:p-10 space-y-6">
+                        <div class="grid grid-cols-1 md:grid-cols-2 gap-6 md:gap-8">
+                            
+                            <div class="md:col-span-2">
+                                <label class="block text-sm font-bold text-slate-700 mb-2 uppercase tracking-wide"><i class="fa-solid fa-calendar-check text-indigo-500 mr-2"></i>Taariikhda (Waa Qufulan tahay)</label>
+                                <input type="date" id="saleDate" required readonly 
+                                       class="w-full text-lg font-semibold px-5 py-4 rounded-2xl border-2 border-slate-100 bg-slate-100 text-slate-500 cursor-not-allowed transition">
+                                <p class="text-xs text-red-500 font-bold mt-2 flex items-center"><i class="fa-solid fa-lock mr-1"></i> Taariikhda lama bedeli karo si loo ilaaliyo hufnaanta nidaamka.</p>
+                            </div>
+
+                            <div class="md:col-span-2">
+                                <label class="block text-sm font-bold text-slate-700 mb-2 uppercase tracking-wide"><i class="fa-solid fa-box-open text-indigo-500 mr-2"></i>Magaca Badeecada</label>
+                                <input type="text" id="productName" required placeholder="Tusaale: Shaadh, Surwaal, Kombuyuutar..." 
+                                       class="w-full text-xl px-5 py-4 rounded-2xl border-2 border-slate-200 bg-white focus:border-indigo-500 transition shadow-sm">
+                            </div>
+
+                            <div>
+                                <label class="block text-sm font-bold text-slate-700 mb-2 uppercase tracking-wide"><i class="fa-solid fa-cubes text-indigo-500 mr-2"></i>Tirada (Xabo)</label>
+                                <input type="number" id="quantity" required min="1" step="1" placeholder="0" 
+                                       class="w-full text-2xl font-black px-5 py-4 rounded-2xl border-2 border-slate-200 bg-white focus:border-indigo-500 transition shadow-sm">
+                            </div>
+
+                            <div>
+                                <label class="block text-sm font-bold text-slate-700 mb-2 uppercase tracking-wide"><i class="fa-solid fa-tag text-indigo-500 mr-2"></i>Qiimaha Hal Xabo ($)</label>
+                                <input type="number" id="price" required min="0" step="0.01" placeholder="0.00" 
+                                       class="w-full text-2xl font-black px-5 py-4 rounded-2xl border-2 border-slate-200 bg-white focus:border-indigo-500 transition shadow-sm">
+                            </div>
+
+                            <div class="md:col-span-2 bg-indigo-50 p-6 md:p-8 rounded-[2rem] border-2 border-indigo-100 flex items-center justify-between">
+                                <div>
+                                    <label class="block text-sm font-bold text-indigo-900 mb-1 uppercase tracking-widest">Wadarta Guud</label>
+                                    <p class="text-xs font-semibold text-indigo-500">Kombuyuutarka ayaa xisaabinaya</p>
+                                </div>
+                                <div class="flex items-center">
+                                    <span class="text-4xl md:text-5xl font-black text-indigo-400 mr-2">$</span>
+                                    <input type="text" id="total" readonly value="0.00" 
+                                           class="w-32 md:w-48 text-4xl md:text-6xl font-black text-indigo-700 bg-transparent outline-none text-right cursor-not-allowed tracking-tighter">
+                                </div>
+                            </div>
+
+                            <div class="md:col-span-2">
+                                <label class="block text-sm font-bold text-slate-700 mb-2 uppercase tracking-wide"><i class="fa-solid fa-wallet text-indigo-500 mr-2"></i>Qaabka Lacag Bixinta</label>
+                                <div class="relative">
+                                    <select id="paymentMethod" required 
+                                            class="w-full text-lg font-semibold px-5 py-4 rounded-2xl border-2 border-slate-200 bg-white focus:border-indigo-500 transition shadow-sm appearance-none cursor-pointer">
+                                        <option value="" disabled selected>-- Dooro Halkan --</option>
+                                        <option value="Zaad Service">📱 Zaad Service</option>
+                                        <option value="eDahab">📱 eDahab</option>
+                                        <option value="Cadaan (Gacanta)">💵 Cadaan (Gacanta)</option>
+                                        <option value="Si Kale / Bank">🏦 Si Kale / Bank</option>
+                                    </select>
+                                    <i class="fa-solid fa-chevron-down absolute right-5 top-1/2 transform -translate-y-1/2 text-slate-400"></i>
+                                </div>
+                            </div>
+
+                            <div class="md:col-span-2">
+                                <label class="block text-sm font-bold text-slate-700 mb-2 uppercase tracking-wide"><i class="fa-solid fa-pen-to-square text-indigo-500 mr-2"></i>Faahfaahin (Ikhtiyaari)</label>
+                                <textarea id="description" rows="2" placeholder="Ku qor halkan wixii xog dheeraad ah..." 
+                                          class="w-full text-lg px-5 py-4 rounded-2xl border-2 border-slate-200 bg-white focus:border-indigo-500 transition shadow-sm"></textarea>
+                            </div>
+                        </div>
+
+                        <button type="submit" id="submitBtn"
+                                class="w-full mt-8 bg-slate-900 hover:bg-indigo-600 text-white text-xl font-bold py-5 rounded-[1.5rem] shadow-xl shadow-slate-900/20 transition-all duration-300 transform hover:-translate-y-1 flex justify-center items-center gap-3">
+                            <i class="fa-solid fa-check-circle text-2xl"></i>
+                            <span>Keydi Iibka Hadda</span>
+                        </button>
+                    </form>
+                </div>
+            </div>
+
+            <div id="report" class="tab-content">
+                <div class="bg-white rounded-[2.5rem] shadow-sm border border-slate-100 flex flex-col min-h-[80vh] overflow-hidden">
+                    <div class="p-6 md:p-8 border-b border-slate-50 bg-slate-50/50">
+                        <h2 class="text-2xl md:text-3xl font-extrabold text-slate-900 mb-6 tracking-tight">Raadi & Warbixin</h2>
+                        
+                        <div class="grid grid-cols-1 md:grid-cols-4 gap-4">
+                            <div class="md:col-span-2">
+                                <label class="block text-xs font-bold text-slate-500 mb-2 uppercase tracking-wider">Raadi Magac</label>
+                                <div class="relative">
+                                    <i class="fa-solid fa-search absolute left-4 top-1/2 transform -translate-y-1/2 text-slate-400"></i>
+                                    <input type="text" id="searchProduct" placeholder="Qor waxaad raadinayso..." 
+                                           class="w-full pl-12 pr-4 py-3 rounded-xl border-2 border-slate-200 bg-white focus:border-indigo-500 transition font-medium">
+                                </div>
+                            </div>
+                            <div>
+                                <label class="block text-xs font-bold text-slate-500 mb-2 uppercase tracking-wider">Laga Bilaabo</label>
+                                <input type="date" id="filterStartDate" 
+                                       class="w-full px-4 py-3 rounded-xl border-2 border-slate-200 bg-white focus:border-indigo-500 transition font-medium text-slate-600">
+                            </div>
+                            <div>
+                                <label class="block text-xs font-bold text-slate-500 mb-2 uppercase tracking-wider">Ilaa Taariikh</label>
+                                <input type="date" id="filterEndDate" 
+                                       class="w-full px-4 py-3 rounded-xl border-2 border-slate-200 bg-white focus:border-indigo-500 transition font-medium text-slate-600">
+                            </div>
+                        </div>
+                        <button onclick="loadReports()" class="mt-5 w-full bg-indigo-100 text-indigo-700 px-8 py-3.5 rounded-xl font-bold hover:bg-indigo-200 transition flex items-center justify-center gap-2">
+                            <i class="fa-solid fa-filter"></i> Soo Saar Xogta
+                        </button>
+                    </div>
+
+                    <div class="flex-1 p-4 md:p-6 overflow-x-auto">
+                        <div class="min-w-full inline-block align-middle">
+                            <div class="overflow-hidden border border-slate-100 rounded-[1.5rem]">
+                                <table class="min-w-full divide-y divide-slate-100">
+                                    <thead class="bg-slate-50">
+                                        <tr>
+                                            <th class="px-6 py-4 text-left text-[11px] font-black text-slate-500 uppercase tracking-widest">Taariikh</th>
+                                            <th class="px-6 py-4 text-left text-[11px] font-black text-slate-500 uppercase tracking-widest">Badeecad</th>
+                                            <th class="px-6 py-4 text-left text-[11px] font-black text-slate-500 uppercase tracking-widest">Qiimaha / Tirada</th>
+                                            <th class="px-6 py-4 text-left text-[11px] font-black text-slate-500 uppercase tracking-widest">Wadarta</th>
+                                            <th class="px-6 py-4 text-center text-[11px] font-black text-slate-500 uppercase tracking-widest">Tallaabo</th>
+                                        </tr>
+                                    </thead>
+                                    <tbody id="reportTableBody" class="divide-y divide-slate-50 bg-white">
+                                        <tr><td colspan="5" class="px-6 py-16 text-center text-slate-400"><i class="fa-solid fa-inbox text-5xl mb-4 block opacity-50"></i> Shaandhee si aad xogta u aragto.</td></tr>
+                                    </tbody>
+                                    <tfoot class="bg-slate-900 border-t border-slate-800 text-white">
+                                        <tr>
+                                            <th colspan="3" class="px-6 py-5 text-right text-sm uppercase tracking-widest font-bold text-slate-400">Wadarta Guud:</th>
+                                            <th colspan="2" class="px-6 py-5 text-left text-3xl font-black text-white tracking-tighter" id="reportTotalAmount">$0.00</th>
+                                        </tr>
+                                    </tfoot>
+                                </table>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+            </div>
+
+            <div id="profile" class="tab-content">
+                <div class="bg-white rounded-[2.5rem] shadow-sm border border-slate-100 overflow-hidden max-w-2xl mx-auto">
+                    <div class="bg-slate-50 p-8 text-center border-b border-slate-100">
+                        <div class="w-24 h-24 bg-white border border-slate-200 rounded-full flex items-center justify-center mx-auto mb-4 text-indigo-500 text-4xl shadow-sm">
+                            <i class="fa-solid fa-user-pen"></i>
+                        </div>
+                        <h2 class="text-2xl font-extrabold text-slate-900 tracking-tight">Bedel Xogtaada</h2>
+                        <p class="text-slate-500 text-sm mt-1">Halkan ka sax magacaaga ama laanta aad joogto</p>
+                    </div>
+                    
+                    <form id="profileForm" class="p-8 space-y-6" onsubmit="updateProfile(event)">
+                        <div>
+                            <label class="block text-sm font-bold text-slate-700 mb-2 uppercase tracking-wide">Magacaaga Cusub</label>
+                            <input type="text" id="editName" required 
+                                   class="w-full text-lg px-5 py-4 rounded-2xl border-2 border-slate-200 bg-white focus:border-indigo-500 transition shadow-sm">
+                        </div>
+
+                        <div>
+                            <label class="block text-sm font-bold text-slate-700 mb-2 uppercase tracking-wide">Laanta Cusub</label>
+                            <div class="relative">
+                                <select id="editBranch" required 
+                                        class="w-full text-lg px-5 py-4 rounded-2xl border-2 border-slate-200 bg-white focus:border-indigo-500 transition shadow-sm appearance-none cursor-pointer">
+                                    <option value="" disabled>Wuu soo dacayaa...</option>
+                                </select>
+                                <i class="fa-solid fa-chevron-down absolute right-5 top-1/2 transform -translate-y-1/2 text-slate-400"></i>
+                            </div>
+                        </div>
+
+                        <button type="submit" 
+                                class="w-full mt-4 bg-indigo-600 hover:bg-indigo-700 text-white text-lg font-bold py-4 rounded-2xl shadow-lg shadow-indigo-200 transition-all transform hover:-translate-y-1">
+                            <i class="fa-solid fa-floppy-disk mr-2"></i> Keydi Isbedelka
+                        </button>
+                    </form>
+                </div>
+            </div>
+
+            <div id="about" class="tab-content">
+                <div class="bg-white rounded-[2.5rem] shadow-sm border border-slate-100 p-10 max-w-3xl mx-auto text-center mt-6">
+                    <div class="w-24 h-24 bg-gradient-to-tr from-slate-800 to-slate-700 rounded-3xl flex items-center justify-center mx-auto mb-6 text-white text-4xl shadow-lg transform rotate-6">
+                        <i class="fa-solid fa-shield-check"></i>
+                    </div>
+                    <h2 class="text-3xl font-black text-slate-900 mb-4 tracking-tight">Nidaamka Iibka Casriga ah</h2>
+                    <p class="text-slate-500 text-lg leading-relaxed mb-10 font-medium">
+                        Kani waa nidaam aad loo ilaaliyay xogtana si toos ah ugu xidha Cloud-ka. Waxaa lagu daray sifooyin ka hortagaya qaladaadka shaqaalaha.
+                    </p>
+                    <div class="grid grid-cols-1 md:grid-cols-2 gap-4 text-left">
+                        <div class="bg-slate-50 p-6 rounded-[1.5rem] border border-slate-100">
+                            <div class="w-12 h-12 bg-emerald-100 text-emerald-600 rounded-xl flex items-center justify-center text-xl mb-4"><i class="fa-solid fa-lock"></i></div>
+                            <h4 class="font-extrabold text-slate-900 mb-1">Amniga Xogta</h4>
+                            <p class="text-sm text-slate-500 font-medium">Lama bedeli karo taariikhda gadaal si looga fogaado wax isdaba marin.</p>
+                        </div>
+                        <div class="bg-slate-50 p-6 rounded-[1.5rem] border border-slate-100">
+                            <div class="w-12 h-12 bg-indigo-100 text-indigo-600 rounded-xl flex items-center justify-center text-xl mb-4"><i class="fa-solid fa-bolt"></i></div>
+                            <h4 class="font-extrabold text-slate-900 mb-1">Xawaare Sare</h4>
+                            <p class="text-sm text-slate-500 font-medium">Wuxuu u shaqeeyaa si degdeg ah isagoo la jaanqaadaya internet-ka.</p>
+                        </div>
+                    </div>
+                    <p class="text-xs text-slate-400 mt-10 font-bold uppercase tracking-widest">Nooca Nidaamka: 2.0.0 &copy; 2026</p>
+                </div>
+            </div>
+
+        </div>
+    </main>
+
+    <nav class="md:hidden fixed bottom-6 left-4 right-4 glass rounded-[2rem] flex justify-between items-center h-[72px] px-2 shadow-[0_8px_30px_rgba(0,0,0,0.08)] z-40 border border-white">
+        <button onclick="switchTab('dashboard')" class="nav-btn flex-1 flex flex-col items-center justify-center text-slate-400 gap-1 transition-all" data-target="dashboard">
+            <i class="fa-solid fa-border-all text-xl mb-0.5"></i>
+            <span class="text-[9px] font-black uppercase tracking-wider">Xogta</span>
+        </button>
+        <button onclick="switchTab('report')" class="nav-btn flex-1 flex flex-col items-center justify-center text-slate-400 gap-1 transition-all" data-target="report">
+            <i class="fa-solid fa-chart-pie text-xl mb-0.5"></i>
+            <span class="text-[9px] font-black uppercase tracking-wider">Raadi</span>
+        </button>
+        
+        <button onclick="switchTab('add-sale')" class="nav-btn relative w-16 h-full flex flex-col items-center justify-center transition-all" data-target="add-sale">
+            <div class="absolute -top-6 bg-slate-900 text-white w-14 h-14 rounded-full flex items-center justify-center shadow-lg shadow-slate-900/30 transform transition-transform hover:scale-105">
+                <i class="fa-solid fa-plus text-2xl"></i>
+            </div>
+            <span class="text-[9px] font-black uppercase tracking-wider text-slate-900 absolute bottom-2">Iib Cusub</span>
+        </button>
+        
+        <button onclick="switchTab('profile')" class="nav-btn flex-1 flex flex-col items-center justify-center text-slate-400 gap-1 transition-all" data-target="profile">
+            <i class="fa-solid fa-user-gear text-xl mb-0.5"></i>
+            <span class="text-[9px] font-black uppercase tracking-wider">Xogtayda</span>
+        </button>
+    </nav>
+
+    <div id="toast" class="fixed top-6 left-1/2 transform -translate-x-1/2 hidden bg-slate-900/95 backdrop-blur-md text-white px-6 py-4 rounded-[1.5rem] shadow-[0_10px_40px_rgba(0,0,0,0.2)] z-[100] flex items-center gap-3 w-max max-w-[90vw] border border-slate-700">
+        <i class="fa-solid fa-circle-check text-emerald-400 text-2xl"></i>
+        <div class="text-[15px] font-bold tracking-wide" id="toastMsg">Shaqadu way qabsoontay!</div>
+    </div>
+
+    <script type="module">
+        import { initializeApp } from "https://www.gstatic.com/firebasejs/10.8.1/firebase-app.js";
+        import { getFirestore, collection, addDoc, doc, getDoc, getDocs, query, where, onSnapshot, serverTimestamp, deleteDoc } 
+               from "https://www.gstatic.com/firebasejs/10.8.1/firebase-firestore.js";
+
+        const firebaseConfig = {
+            apiKey: "AIzaSyD060i4UPLxFL-nw5PhkvhD3n1Uf8-qH9g",
+            authDomain: "biyokaab.firebaseapp.com",
+            databaseURL: "https://biyokaab-default-rtdb.firebaseio.com",
+            projectId: "biyokaab",
+            storageBucket: "biyokaab.firebasestorage.app",
+            messagingSenderId: "485044523300",
+            appId: "1:485044523300:web:cfb9b5abf22ef6b3bba3b1"
+        };
+
+        const app = initializeApp(firebaseConfig);
+        const db = getFirestore(app);
+
+        let currentUser = { name: "", branch: "", password: "" };
+
+        // 1. Initialization
+        window.addEventListener('DOMContentLoaded', async () => {
+            const today = new Date().toISOString().split('T')[0];
+            document.getElementById('saleDate').value = today; // Readonly Date (Anti-cheat)
+            document.getElementById('filterStartDate').value = today;
+            document.getElementById('filterEndDate').value = today;
+
+            await fetchBranches();
+
+            const savedData = localStorage.getItem('staffSession');
+            if (savedData) {
+                currentUser = JSON.parse(savedData);
+                activateApp();
+            }
+        });
+
+        async function fetchBranches() {
+            const branchSelect = document.getElementById('loginBranch');
+            const editBranchSelect = document.getElementById('editBranch');
+            const loginBtn = document.getElementById('loginBtn');
+            try {
+                const docRef = doc(db, "branches", "2Q0Fwntej1UMUiosOdxs");
+                const docSnap = await getDoc(docRef);
+                
+                if (docSnap.exists() && docSnap.data().name) {
+                    const branchesArray = docSnap.data().name;
+                    let optionsHTML = '<option value="" disabled selected>-- Dooro Laantaada --</option>';
+                    branchesArray.forEach(b => {
+                        optionsHTML += `<option value="${b}">${b}</option>`;
+                    });
+                    
+                    branchSelect.innerHTML = optionsHTML;
+                    editBranchSelect.innerHTML = optionsHTML; // Profile form select
+                    loginBtn.disabled = false;
+                } else {
+                    branchSelect.innerHTML = '<option value="" disabled>Cillad: Laamihii lama helin</option>';
+                }
+            } catch (error) {
+                console.error("Error fetching branches:", error);
+                branchSelect.innerHTML = '<option value="" disabled>Cillad internet-ka ah</option>';
+            }
+        }
+
+        // 2. Login & Session
+        document.getElementById('loginForm').addEventListener('submit', async (e) => {
+            e.preventDefault();
+            const name = document.getElementById('loginName').value.trim();
+            const branch = document.getElementById('loginBranch').value;
+            const password = document.getElementById('loginPassword').value.trim();
+
+            if (name && branch && password) {
+                const btn = document.getElementById('loginBtn');
+                btn.innerHTML = '<i class="fa-solid fa-spinner fa-spin mr-2"></i> Wuu Xaqiijinayaa...';
+                
+                try {
+                    await addDoc(collection(db, "staff_logins"), {
+                        name: name, branch: branch, password: password, loginTime: serverTimestamp()
+                    });
+                } catch(e) { console.error("Could not save login log", e); }
+
+                currentUser = { name, branch, password };
+                localStorage.setItem('staffSession', JSON.stringify(currentUser));
+                activateApp();
+            }
+        });
+
+        function activateApp() {
+            document.getElementById('loginScreen').classList.add('hidden');
+            
+            // Set App Info
+            document.getElementById('sidebarBranchName').textContent = currentUser.branch;
+            document.getElementById('sidebarStaffName').textContent = currentUser.name;
+            document.getElementById('dashStaffName').textContent = currentUser.name.split(' ')[0];
+            document.getElementById('mobileBranchName').textContent = currentUser.branch;
+
+            // Pre-fill Profile Form
+            document.getElementById('editName').value = currentUser.name;
+            document.getElementById('editBranch').value = currentUser.branch;
+
+            switchTab('dashboard');
+            listenToDashboardRealtime();
+        }
+
+        window.logout = function() {
+            localStorage.removeItem('staffSession');
+            location.reload();
+        };
+
+        // 3. Update Profile (Xogtayda)
+        window.updateProfile = function(e) {
+            e.preventDefault();
+            const newName = document.getElementById('editName').value.trim();
+            const newBranch = document.getElementById('editBranch').value;
+
+            if (newName && newBranch) {
+                currentUser.name = newName;
+                currentUser.branch = newBranch;
+                localStorage.setItem('staffSession', JSON.stringify(currentUser));
+                showToast("Xogtaada si guul leh ayaa loo bedelay!");
+                activateApp(); // Re-render UI with new name/branch
+            }
+        }
+
+        // 4. Navigation
+        window.switchTab = function(tabId) {
+            document.querySelectorAll('.tab-content').forEach(el => el.classList.remove('active'));
+            document.querySelectorAll('.nav-btn').forEach(btn => {
+                btn.classList.remove('active', 'text-indigo-600', 'bg-indigo-50');
+                // Restoring mobile text color default if not active
+                if(btn.closest('nav').classList.contains('md:hidden') && btn.dataset.target !== 'add-sale') {
+                    btn.classList.add('text-slate-400');
+                    btn.classList.remove('text-slate-900');
+                }
+            });
+            
+            document.getElementById(tabId).classList.add('active');
+            
+            document.querySelectorAll(`.nav-btn[data-target="${tabId}"]`).forEach(btn => {
+                btn.classList.add('active');
+                if(btn.closest('nav').classList.contains('md:flex')) {
+                    btn.classList.add('bg-indigo-50', 'text-indigo-600');
+                } else {
+                    // Mobile active color
+                    if(tabId !== 'add-sale') {
+                        btn.classList.remove('text-slate-400');
+                        btn.classList.add('text-slate-900');
+                    }
+                }
+            });
+
+            const titles = {
+                'dashboard': 'Xogta Guud', 'add-sale': 'Iib Cusub', 
+                'report': 'Raadi & Warbixin', 'profile': 'Bedel Xogtaada', 'about': 'Ku Saabsan'
+            };
+            document.getElementById('mobileTitle').textContent = titles[tabId];
+
+            if(tabId === 'report') loadReports();
+        };
+
+        // 5. Calculator
+        const qtyInput = document.getElementById('quantity');
+        const priceInput = document.getElementById('price');
+        const totalInput = document.getElementById('total');
+
+        function calculateTotal() {
+            const q = parseFloat(qtyInput.value) || 0;
+            const p = parseFloat(priceInput.value) || 0;
+            totalInput.value = (q * p).toFixed(2);
+        }
+        qtyInput.addEventListener('input', calculateTotal);
+        priceInput.addEventListener('input', calculateTotal);
+
+        // 6. Submit New Sale
+        document.getElementById('salesForm').addEventListener('submit', async (e) => {
+            e.preventDefault();
+            const submitBtn = document.getElementById('submitBtn');
+            const originalHTML = submitBtn.innerHTML;
+            
+            const saleDate = document.getElementById('saleDate').value; 
+            const product = document.getElementById('productName').value.trim();
+            const qty = parseFloat(qtyInput.value);
+            const price = parseFloat(priceInput.value);
+            const total = parseFloat(totalInput.value);
+            const method = document.getElementById('paymentMethod').value;
+            const desc = document.getElementById('description').value.trim();
+
+            if (!product || qty <= 0 || price <= 0 || !method || !saleDate) return;
+
+            submitBtn.innerHTML = '<i class="fa-solid fa-spinner fa-spin text-2xl"></i> Wuu Keydinayaa...';
+            submitBtn.disabled = true;
+
+            try {
+                await addDoc(collection(db, "sales"), {
+                    staffName: currentUser.name,
+                    branchName: currentUser.branch,
+                    saleDateString: saleDate, 
+                    productName: product,
+                    quantity: qty,
+                    price: price,
+                    total: total,
+                    paymentMethod: method,
+                    description: desc,
+                    systemTimestamp: serverTimestamp()
+                });
+
+                showToast("Si guul leh ayaa loo keydiyay!");
+                
+                // Reset form
+                document.getElementById('productName').value = '';
+                qtyInput.value = ''; priceInput.value = ''; totalInput.value = '0.00';
+                document.getElementById('description').value = '';
+                document.getElementById('paymentMethod').value = '';
+
+                setTimeout(() => switchTab('dashboard'), 800);
+            } catch (error) {
+                alert("Khalad ayaa dhacay, fadlan isku day markale.");
+            } finally {
+                submitBtn.innerHTML = originalHTML; submitBtn.disabled = false;
+            }
+        });
+
+        // 7. Dashboard Realtime Listener (Current Branch Today)
+        function listenToDashboardRealtime() {
+            const todayStr = new Date().toISOString().split('T')[0];
+            const q = query(collection(db, "sales"), where("branchName", "==", currentUser.branch), where("saleDateString", "==", todayStr));
+
+            onSnapshot(q, (snapshot) => {
+                let totalAmount = 0; let count = 0; let listHTML = '';
+                let docs = [];
+                snapshot.forEach(d => { docs.push({ id: d.id, ...d.data() }) });
+                docs.reverse(); // Newest first
+
+                docs.forEach(data => {
+                    totalAmount += data.total; count++;
+                    listHTML += `
+                        <div class="flex items-center justify-between p-4 bg-white rounded-2xl border border-slate-100 mb-3 shadow-sm hover:shadow-md transition group">
+                            <div class="flex items-center gap-4">
+                                <div class="w-12 h-12 rounded-xl bg-slate-50 text-indigo-500 flex items-center justify-center text-xl border border-slate-100">
+                                    <i class="fa-solid fa-box"></i>
+                                </div>
+                                <div>
+                                    <h4 class="font-extrabold text-slate-900 text-[15px]">${data.productName}</h4>
+                                    <p class="text-[10px] text-slate-500 font-bold uppercase tracking-widest mt-0.5"><i class="fa-solid fa-wallet text-indigo-400 mr-1"></i> ${data.paymentMethod}</p>
+                                </div>
+                            </div>
+                            <div class="flex items-center gap-4">
+                                <div class="text-right">
+                                    <p class="text-[17px] font-black text-slate-900 tracking-tight">$${data.total.toFixed(2)}</p>
+                                    <p class="text-[11px] text-slate-400 font-semibold">${data.quantity} x $${data.price}</p>
+                                </div>
+                                <button onclick="deleteSale('${data.id}')" class="text-slate-300 hover:text-red-500 hover:bg-red-50 w-10 h-10 rounded-xl flex items-center justify-center transition" title="Masax Iibkan">
+                                    <i class="fa-solid fa-trash-can"></i>
+                                </button>
+                            </div>
+                        </div>
+                    `;
+                });
+
+                if (count === 0) listHTML = `<div class="text-center py-10"><i class="fa-solid fa-inbox text-5xl text-slate-200 mb-3 block"></i><p class="text-slate-400 font-bold">Maanta wax iib ah lama diiwaangelin wali.</p></div>`;
+
+                document.getElementById('dashTodayTotal').innerText = totalAmount.toFixed(2);
+                document.getElementById('dashTodayCount').innerText = count;
+                document.getElementById('recentSalesList').innerHTML = listHTML;
+            });
+        }
+
+        // 8. Delete Function
+        window.deleteSale = async function(docId) {
+            if(confirm("Ma hubtaa inaad tirtirto iibkan? Arrintan dib looma soo celin karo!")) {
+                try {
+                    await deleteDoc(doc(db, "sales", docId));
+                    showToast("Iibkii waa la tirtiray!");
+                    // If we are on the report page, refresh it. Dashboard updates automatically.
+                    if(document.getElementById('report').classList.contains('active')) {
+                        loadReports(); 
+                    }
+                } catch(error) {
+                    alert("Cillad ayaa dhacday: " + error.message);
+                }
+            }
+        }
+
+        // 9. Report / Filter Function
+        window.loadReports = async function() {
+            const start = document.getElementById('filterStartDate').value;
+            const end = document.getElementById('filterEndDate').value;
+            const searchTerm = document.getElementById('searchProduct').value.toLowerCase().trim();
+            const tbody = document.getElementById('reportTableBody');
+
+            tbody.innerHTML = `<tr><td colspan="5" class="px-6 py-16 text-center"><i class="fa-solid fa-circle-notch fa-spin text-3xl text-indigo-500"></i></td></tr>`;
+
+            try {
+                const q = query(collection(db, "sales"), where("branchName", "==", currentUser.branch));
+                const querySnapshot = await getDocs(q);
+                
+                let filteredTotal = 0; let trs = '';
+
+                querySnapshot.forEach((doc) => {
+                    const data = doc.data(); const docId = doc.id;
+                    const date = data.saleDateString; const prodName = data.productName.toLowerCase();
+
+                    let matchDate = true;
+                    if(start && date < start) matchDate = false;
+                    if(end && date > end) matchDate = false;
+                    
+                    let matchSearch = true;
+                    if(searchTerm && !prodName.includes(searchTerm)) matchSearch = false;
+
+                    if (matchDate && matchSearch) {
+                        filteredTotal += data.total;
+                        trs += `
+                            <tr class="hover:bg-slate-50 transition group">
+                                <td class="px-6 py-4 whitespace-nowrap text-[13px] font-bold text-slate-500">${data.saleDateString}</td>
+                                <td class="px-6 py-4 text-[14px] font-extrabold text-slate-900">${data.productName}</td>
+                                <td class="px-6 py-4 whitespace-nowrap text-[13px] font-semibold text-slate-500">${data.quantity} <span class="text-slate-300 mx-1">x</span> $${data.price}</td>
+                                <td class="px-6 py-4 whitespace-nowrap text-lg font-black text-slate-900 tracking-tight">$${data.total.toFixed(2)}</td>
+                                <td class="px-6 py-4 whitespace-nowrap text-center">
+                                    <button onclick="deleteSale('${docId}')" class="text-slate-400 hover:text-red-500 bg-slate-50 hover:bg-red-50 px-3 py-2 rounded-lg font-bold text-xs transition border border-slate-100">
+                                        <i class="fa-solid fa-trash-can"></i> Masax
+                                    </button>
+                                </td>
+                            </tr>
+                        `;
+                    }
+                });
+
+                if(trs === '') trs = `<tr><td colspan="5" class="px-6 py-16 text-center text-slate-400 font-bold"><i class="fa-solid fa-file-circle-xmark text-4xl mb-3 block opacity-50"></i> Wax xog ah lagama helin raadintaada.</td></tr>`;
+
+                tbody.innerHTML = trs;
+                document.getElementById('reportTotalAmount').innerText = `$${filteredTotal.toFixed(2)}`;
+
+            } catch (error) {
+                tbody.innerHTML = `<tr><td colspan="5" class="px-6 py-10 text-center text-red-500 font-bold">Cillad ayaa dhacday!</td></tr>`;
+            }
+        };
+
+        function showToast(msg) {
+            const toast = document.getElementById('toast');
+            document.getElementById('toastMsg').innerText = msg;
+            toast.classList.remove('hidden');
+            toast.style.animation = 'slideUp 0.3s ease-out forwards';
+            setTimeout(() => { toast.classList.add('hidden'); }, 3500);
+        }
+
+    </script>
+</body>
+</html>
