@@ -1,0 +1,840 @@
+<!DOCTYPE html>
+<html lang="so" dir="ltr">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no">
+    <title>Xafiiska Maamulka Guud</title>
+    <script src="https://cdn.tailwindcss.com"></script>
+    <script src="https://kit.fontawesome.com/0ef458b5b5.js" crossorigin="anonymous"></script>
+    <style>
+        @import url('https://fonts.googleapis.com/css2?family=Inter:wght@400;600;700;800;900&display=swap');
+        
+        body { 
+            font-family: 'Inter', sans-serif; 
+            background-color: #f1f5f9; 
+            color: #0f172a; 
+            -webkit-tap-highlight-color: transparent;
+        }
+        
+        /* Custom Scrollbar */
+        ::-webkit-scrollbar { width: 6px; height: 6px; }
+        ::-webkit-scrollbar-track { background: transparent; }
+        ::-webkit-scrollbar-thumb { background: #cbd5e1; border-radius: 10px; }
+        ::-webkit-scrollbar-thumb:hover { background: #94a3b8; }
+        
+        /* Hide scrollbar for horizontal mobile tags */
+        .hide-scrollbar::-webkit-scrollbar { display: none; }
+        .hide-scrollbar { -ms-overflow-style: none; scrollbar-width: none; }
+
+        .tab-content { display: none; animation: fadeIn 0.3s ease-in-out forwards; opacity: 0; }
+        .tab-content.active { display: block; }
+        @keyframes fadeIn { to { opacity: 1; transform: translateY(0); } }
+
+        .white-card { 
+            background: #ffffff; 
+            border-radius: 1rem; 
+            box-shadow: 0 4px 15px -1px rgba(0,0,0,0.05); 
+            border: 1px solid #e2e8f0; 
+        }
+
+        .date-tag { transition: all 0.2s ease; cursor: pointer; flex-shrink: 0; }
+        .date-tag:active { transform: scale(0.95); }
+        .nav-link { transition: all 0.2s ease; }
+    </style>
+</head>
+<body class="h-screen overflow-hidden flex flex-col">
+
+    <div id="loginScreen" class="fixed inset-0 bg-slate-100 z-[100] flex items-center justify-center p-4">
+        <div class="max-w-md w-full white-card p-8 md:p-10 text-center shadow-2xl border-t-8 border-blue-600">
+            <div class="w-24 h-24 bg-blue-100 rounded-full flex items-center justify-center mx-auto mb-6 text-5xl text-blue-600">
+                <i class="fa-solid fa-user-shield"></i>
+            </div>
+            <h1 class="text-3xl font-black text-slate-900 mb-2">Maamulka Guud</h1>
+            <p class="text-slate-500 text-lg mb-8 font-bold">Geli sirta si aad u gasho nidaamka</p>
+
+            <form id="loginForm" class="space-y-6">
+                <div>
+                    <input type="password" id="adminPassword" required placeholder="Lambar Sir ah..." 
+                           class="w-full text-center text-3xl font-black px-6 py-4 rounded-xl bg-slate-50 border-2 border-slate-300 text-slate-900 focus:border-blue-600 focus:outline-none transition tracking-widest">
+                </div>
+                <p id="loginError" class="text-red-600 font-bold hidden text-sm bg-red-50 p-3 rounded-lg"><i class="fa-solid fa-triangle-exclamation mr-1"></i> Sirtaadu waa khalad!</p>
+                <button type="submit" 
+                        class="w-full bg-blue-600 hover:bg-blue-700 text-white text-xl font-black py-4 rounded-xl transition shadow-lg flex justify-center items-center gap-2">
+                    Gal Nidaamka <i class="fa-solid fa-arrow-right"></i>
+                </button>
+            </form>
+        </div>
+    </div>
+
+    <header class="bg-white border-b border-slate-200 flex-none z-40 shadow-sm relative">
+        <div class="flex items-center justify-between px-4 md:px-6 py-3">
+            <div class="flex items-center gap-4">
+                <div class="w-10 h-10 bg-blue-600 text-white rounded-xl flex items-center justify-center text-xl shadow-md">
+                    <i class="fa-solid fa-chart-pie"></i>
+                </div>
+                <div>
+                    <h1 class="text-xl md:text-2xl font-black text-slate-900 tracking-tight">Xafiiska Maamulka</h1>
+                    <p class="text-slate-500 text-xs md:text-sm font-bold" id="liveClock">00:00:00</p>
+                </div>
+            </div>
+            <button onclick="logoutAdmin()" class="bg-red-50 hover:bg-red-100 text-red-600 px-4 py-2 rounded-xl font-bold transition border border-red-200 flex items-center gap-2">
+                <i class="fa-solid fa-power-off"></i> <span class="hidden md:block">Ka bax</span>
+            </button>
+        </div>
+    </header>
+
+    <div class="bg-white border-b border-slate-200 px-4 md:px-6 py-3 flex-none z-30 shadow-sm flex flex-col md:flex-row justify-between items-center gap-4">
+        
+        <div class="w-full md:w-auto flex overflow-x-auto hide-scrollbar gap-2 pb-1 md:pb-0">
+            <button onclick="setQuickDate('today')" id="tag-today" class="date-tag bg-blue-100 border-blue-500 text-blue-800 border-2 px-4 py-2 rounded-xl font-bold text-sm flex items-center gap-2 whitespace-nowrap">
+                <i class="fa-solid fa-calendar-day"></i> Maanta
+            </button>
+            <button onclick="setQuickDate('yesterday')" id="tag-yesterday" class="date-tag bg-white border-slate-200 text-slate-600 border-2 px-4 py-2 rounded-xl font-bold hover:bg-slate-50 text-sm flex items-center gap-2 whitespace-nowrap">
+                <i class="fa-solid fa-clock-rotate-left"></i> Shalay
+            </button>
+            <button onclick="setQuickDate('week')" id="tag-week" class="date-tag bg-white border-slate-200 text-slate-600 border-2 px-4 py-2 rounded-xl font-bold hover:bg-slate-50 text-sm flex items-center gap-2 whitespace-nowrap">
+                <i class="fa-solid fa-calendar-week"></i> Todobaadkan
+            </button>
+            <button onclick="setQuickDate('month')" id="tag-month" class="date-tag bg-white border-slate-200 text-slate-600 border-2 px-4 py-2 rounded-xl font-bold hover:bg-slate-50 text-sm flex items-center gap-2 whitespace-nowrap">
+                <i class="fa-solid fa-calendar-days"></i> Bishan
+            </button>
+            <button onclick="setQuickDate('all')" id="tag-all" class="date-tag bg-white border-slate-200 text-slate-600 border-2 px-4 py-2 rounded-xl font-bold hover:bg-slate-50 text-sm flex items-center gap-2 whitespace-nowrap">
+                <i class="fa-solid fa-infinity"></i> Dhammaan
+            </button>
+        </div>
+
+        <div class="w-full md:w-auto flex flex-row items-center gap-2">
+            <input type="date" id="gStartDate" onchange="applyCustomDate()" class="bg-slate-50 border border-slate-200 text-slate-800 font-bold py-2 px-3 rounded-lg focus:outline-none focus:border-blue-500 text-sm w-full md:w-auto">
+            <span class="text-slate-400 font-bold">-</span>
+            <input type="date" id="gEndDate" onchange="applyCustomDate()" class="bg-slate-50 border border-slate-200 text-slate-800 font-bold py-2 px-3 rounded-lg focus:outline-none focus:border-blue-500 text-sm w-full md:w-auto">
+        </div>
+    </div>
+
+    <div class="flex flex-1 overflow-hidden relative">
+        
+        <nav class="hidden md:flex w-64 bg-white border-r border-slate-200 flex-col justify-start pt-6 z-20 shadow-sm">
+            <div class="flex flex-col gap-2 px-3">
+                <a href="#dashboard" class="nav-link flex items-center gap-4 px-4 py-4 rounded-xl text-slate-600 hover:bg-slate-50 transition font-bold">
+                    <i class="fa-solid fa-border-all text-2xl w-8 text-center text-blue-600"></i> <span class="text-lg">Xogta Guud</span>
+                </a>
+                <a href="#branches" class="nav-link flex items-center gap-4 px-4 py-4 rounded-xl text-slate-600 hover:bg-slate-50 transition font-bold">
+                    <i class="fa-solid fa-building-columns text-2xl w-8 text-center text-blue-600"></i> <span class="text-lg">Laamaha</span>
+                </a>
+                <a href="#staff" class="nav-link flex items-center gap-4 px-4 py-4 rounded-xl text-slate-600 hover:bg-slate-50 transition font-bold">
+                    <i class="fa-solid fa-users text-2xl w-8 text-center text-blue-600"></i> <span class="text-lg">Shaqaalaha</span>
+                </a>
+                <a href="#reports" class="nav-link flex items-center gap-4 px-4 py-4 rounded-xl text-slate-600 hover:bg-slate-50 transition font-bold">
+                    <i class="fa-solid fa-file-invoice-dollar text-2xl w-8 text-center text-blue-600"></i> <span class="text-lg">Warbixinta Shaxda</span>
+                </a>
+            </div>
+            <div class="mt-auto p-4 mb-4 mx-3 bg-slate-50 border border-slate-200 rounded-xl text-center">
+                <p class="text-xs text-slate-500 font-bold">Waqtiga La Doortay:</p>
+                <p class="text-sm text-blue-600 font-black mt-1 uppercase" id="sidebarDateRange">Maanta</p>
+            </div>
+        </nav>
+
+        <main class="flex-1 overflow-y-auto p-4 md:p-6 bg-slate-50 pb-28 md:pb-6">
+            
+            <div id="dashboard" class="tab-content space-y-6">
+                <h2 class="text-2xl font-black text-slate-800 flex items-center justify-between">
+                    Xisaabta Guud ee Muddada
+                    <span class="text-sm font-bold bg-blue-100 text-blue-800 px-3 py-1 rounded-full label-period">Maanta</span>
+                </h2>
+
+                <div class="grid grid-cols-2 md:grid-cols-4 gap-4">
+                    <div class="col-span-2 md:col-span-2 white-card p-6 border-t-8 border-emerald-500 bg-emerald-50/50">
+                        <h3 class="text-slate-500 font-bold text-xs uppercase tracking-wider mb-1">Wadarta Dakhliga</h3>
+                        <div class="text-4xl md:text-5xl font-black text-emerald-600 tracking-tighter" id="dashTotalRev">$0.00</div>
+                    </div>
+                    <div class="white-card p-6 border-t-8 border-blue-500">
+                        <h3 class="text-slate-500 font-bold text-xs uppercase tracking-wider mb-1">Tirada Iibka</h3>
+                        <div class="text-3xl md:text-4xl font-black text-blue-600 tracking-tighter" id="dashSalesCount">0</div>
+                    </div>
+                    <div class="white-card p-6 border-t-8 border-slate-600">
+                        <h3 class="text-slate-500 font-bold text-xs uppercase tracking-wider mb-1">Shaqaale</h3>
+                        <div class="text-3xl md:text-4xl font-black text-slate-800 tracking-tighter" id="dashStaffCount">0</div>
+                    </div>
+                </div>
+
+                <div class="white-card p-5 mt-6 border-2 border-slate-200">
+                    <h2 class="text-lg font-black text-slate-800 mb-4 border-b border-slate-100 pb-3 flex items-center">
+                        <i class="fa-solid fa-list-ul text-blue-500 mr-2"></i> Dhaqdhaqaaqa Muddadaas (Latest)
+                    </h2>
+                    <div id="cctvFeedList" class="space-y-3 max-h-[350px] overflow-y-auto pr-2">
+                        <div class="text-center py-8 text-slate-400 font-bold"><i class="fa-solid fa-spinner fa-spin mr-2"></i> Wuu xisaabinayaa...</div>
+                    </div>
+                </div>
+            </div>
+
+            <div id="branches" class="tab-content">
+                <h2 class="text-2xl font-black text-slate-800 mb-6 flex items-center justify-between">
+                    Xaaladda Laamaha
+                    <span class="text-sm font-bold bg-blue-100 text-blue-800 px-3 py-1 rounded-full label-period">Maanta</span>
+                </h2>
+                <div class="grid grid-cols-1 md:grid-cols-2 xl:grid-cols-3 gap-5" id="branchCardsContainer">
+                    </div>
+            </div>
+
+            <div id="branch-details" class="tab-content">
+                <div class="mb-5 flex flex-col md:flex-row md:items-center justify-between gap-4">
+                    <div>
+                        <a href="#branches" class="inline-flex items-center gap-2 text-slate-500 hover:text-blue-600 font-bold text-sm mb-2 transition bg-white px-3 py-1.5 rounded-lg border border-slate-200 shadow-sm">
+                            <i class="fa-solid fa-arrow-left"></i> Ku noqo Laamaha
+                        </a>
+                        <h2 class="text-2xl md:text-3xl font-black text-slate-900 flex items-center gap-3 mt-1">
+                            <div class="w-10 h-10 bg-blue-100 text-blue-600 rounded-lg flex items-center justify-center"><i class="fa-solid fa-building"></i></div>
+                            <span id="bd-name" class="uppercase">Laanta</span>
+                        </h2>
+                    </div>
+                    <span class="text-sm font-bold bg-slate-200 text-slate-700 px-4 py-2 rounded-lg label-period self-start md:self-auto">Maanta</span>
+                </div>
+
+                <div class="grid grid-cols-1 sm:grid-cols-3 gap-4 mb-6">
+                    <div class="white-card p-5 border-t-4 border-emerald-500 bg-emerald-50/50">
+                        <p class="text-emerald-700 font-bold mb-1 text-xs uppercase tracking-wider">Wadarta Lacagta</p>
+                        <p class="text-3xl font-black text-emerald-700 tracking-tighter" id="bd-total-amount">$0.00</p>
+                    </div>
+                    <div class="white-card p-5 border-t-4 border-blue-500">
+                        <p class="text-slate-500 font-bold mb-1 text-xs uppercase tracking-wider">Tirada Iibka</p>
+                        <p class="text-2xl font-black text-blue-600" id="bd-total-count">0</p>
+                    </div>
+                    <div class="white-card p-5 border-t-4 border-slate-500">
+                        <p class="text-slate-500 font-bold mb-1 text-xs uppercase tracking-wider">Shaqaalaha Wax Iibiyay</p>
+                        <p class="text-2xl font-black text-slate-800" id="bd-staff-count">0</p>
+                    </div>
+                </div>
+
+                <div class="white-card overflow-hidden flex flex-col shadow-sm border-2 border-slate-200">
+                    <div class="p-4 border-b border-slate-100 bg-slate-50">
+                        <h3 class="text-lg font-black text-slate-800"><i class="fa-solid fa-list-check text-blue-500 mr-2"></i> Diiwaanka Iibka ee Laantan</h3>
+                    </div>
+                    <div class="overflow-x-auto max-h-[500px]">
+                        <table class="w-full text-left border-collapse whitespace-nowrap min-w-[500px]">
+                            <thead class="bg-white sticky top-0 z-10 shadow-sm border-b-2 border-slate-100">
+                                <tr class="text-slate-500 text-xs uppercase tracking-wider">
+                                    <th class="p-4 font-bold">Taariikhda</th>
+                                    <th class="p-4 font-bold">Shaqaalaha</th>
+                                    <th class="p-4 font-bold">Badeecada</th>
+                                    <th class="p-4 font-bold text-right">Lacagta ($)</th>
+                                </tr>
+                            </thead>
+                            <tbody id="bd-table-body" class="divide-y divide-slate-50 bg-white text-sm md:text-base">
+                                <tr><td colspan="4" class="p-10 text-center font-bold text-slate-400">Wuu xisaabinayaa...</td></tr>
+                            </tbody>
+                        </table>
+                    </div>
+                </div>
+            </div>
+
+            <div id="staff" class="tab-content">
+                <h2 class="text-2xl font-black text-slate-800 mb-6 flex items-center justify-between">
+                    Qiimaynta Shaqaalaha
+                    <span class="text-sm font-bold bg-blue-100 text-blue-800 px-3 py-1 rounded-full label-period">Maanta</span>
+                </h2>
+                
+                <div class="white-card overflow-hidden flex flex-col shadow-sm border-2 border-slate-200">
+                    <div class="overflow-x-auto">
+                        <table class="w-full text-left border-collapse whitespace-nowrap min-w-[500px]">
+                            <thead class="bg-blue-50 border-b-2 border-blue-100">
+                                <tr class="text-blue-800 text-xs md:text-sm">
+                                    <th class="p-4 font-black uppercase tracking-wider"># Magaca Shaqaalaha</th>
+                                    <th class="p-4 font-black uppercase tracking-wider">Laanta</th>
+                                    <th class="p-4 font-black uppercase tracking-wider text-right">Lacagta ($)</th>
+                                    <th class="p-4 font-black uppercase tracking-wider text-center">Faahfaahin</th>
+                                </tr>
+                            </thead>
+                            <tbody id="allStaffTableBody" class="divide-y divide-slate-100 bg-white">
+                                <tr><td colspan="4" class="p-10 text-center font-bold text-slate-400"><i class="fa-solid fa-spinner fa-spin mr-2"></i> Wuu akhrinayaa...</td></tr>
+                            </tbody>
+                        </table>
+                    </div>
+                </div>
+            </div>
+
+            <div id="staff-details" class="tab-content">
+                <div class="mb-5 flex flex-col md:flex-row md:items-center justify-between gap-4">
+                    <div>
+                        <a href="#staff" class="inline-flex items-center gap-2 text-slate-500 hover:text-blue-600 font-bold text-sm mb-2 transition bg-white px-3 py-1.5 rounded-lg border border-slate-200 shadow-sm">
+                            <i class="fa-solid fa-arrow-left"></i> Ku noqo Shaqaalaha
+                        </a>
+                        <h2 class="text-2xl md:text-3xl font-black text-slate-900 flex items-center gap-3 mt-1">
+                            <div class="w-10 h-10 bg-blue-100 text-blue-600 rounded-full flex items-center justify-center"><i class="fa-solid fa-user-tie"></i></div>
+                            <span id="sd-name" class="uppercase">Magaca</span>
+                        </h2>
+                    </div>
+                    <span class="text-sm font-bold bg-slate-200 text-slate-700 px-4 py-2 rounded-lg label-period self-start md:self-auto">Maanta</span>
+                </div>
+
+                <div class="grid grid-cols-1 sm:grid-cols-3 gap-4 mb-6">
+                    <div class="white-card p-5 border-t-4 border-slate-500">
+                        <p class="text-slate-400 font-bold mb-1 text-xs uppercase tracking-wider">Laanta Uu Joogo</p>
+                        <p class="text-xl md:text-2xl font-black text-slate-800 uppercase" id="sd-branch">-</p>
+                    </div>
+                    <div class="white-card p-5 border-t-4 border-emerald-500 bg-emerald-50/50">
+                        <p class="text-emerald-700 font-bold mb-1 text-xs uppercase tracking-wider">Wadarta Lacagta</p>
+                        <p class="text-3xl font-black text-emerald-700 tracking-tighter" id="sd-total-amount">$0.00</p>
+                    </div>
+                    <div class="white-card p-5 border-t-4 border-blue-500">
+                        <p class="text-slate-400 font-bold mb-1 text-xs uppercase tracking-wider">Tirada Iibka</p>
+                        <p class="text-2xl font-black text-blue-600" id="sd-total-count">0</p>
+                    </div>
+                </div>
+
+                <div class="white-card overflow-hidden flex flex-col shadow-sm border-2 border-slate-200">
+                    <div class="p-4 border-b border-slate-100 bg-slate-50">
+                        <h3 class="text-lg font-black text-slate-800"><i class="fa-solid fa-clipboard-list text-blue-500 mr-2"></i> Diiwaanka Iibkiisa</h3>
+                    </div>
+                    <div class="overflow-x-auto max-h-[500px]">
+                        <table class="w-full text-left border-collapse whitespace-nowrap min-w-[500px]">
+                            <thead class="bg-white sticky top-0 z-10 shadow-sm border-b-2 border-slate-100">
+                                <tr class="text-slate-500 text-xs uppercase tracking-wider">
+                                    <th class="p-4 font-bold">Taariikhda</th>
+                                    <th class="p-4 font-bold">Badeecada</th>
+                                    <th class="p-4 font-bold text-center">Tirada</th>
+                                    <th class="p-4 font-bold text-right">Lacagta ($)</th>
+                                </tr>
+                            </thead>
+                            <tbody id="sd-table-body" class="divide-y divide-slate-50 bg-white text-sm md:text-base">
+                            </tbody>
+                        </table>
+                    </div>
+                </div>
+            </div>
+
+            <div id="reports" class="tab-content h-full">
+                <div class="flex flex-col md:flex-row md:items-center justify-between gap-4 mb-6">
+                    <h2 class="text-2xl md:text-3xl font-black text-slate-800 flex items-center">
+                        Shaxda Xogta Guud
+                    </h2>
+                    
+                    <div class="flex items-center gap-2 bg-white px-3 py-2 rounded-lg border border-slate-200 shadow-sm w-full md:w-auto">
+                        <i class="fa-solid fa-filter text-slate-400"></i>
+                        <select id="repFilterBranch" onchange="generateReport()" class="bg-transparent border-none text-slate-800 font-bold focus:outline-none w-full md:w-auto">
+                            <option value="ALL">Dhammaan Laamaha</option>
+                        </select>
+                    </div>
+                </div>
+
+                <div class="white-card overflow-hidden flex flex-col shadow-sm max-h-[75vh] border-2 border-slate-200">
+                    <div class="overflow-auto flex flex-col h-full">
+                        <table class="w-full text-left border-collapse whitespace-nowrap min-w-[600px] mb-2">
+                            <thead class="bg-blue-50 sticky top-0 z-10 shadow-sm">
+                                <tr class="text-blue-800 text-xs md:text-sm border-b-2 border-blue-200">
+                                    <th class="p-4 font-black uppercase tracking-wider">Taariikhda</th>
+                                    <th class="p-4 font-black uppercase tracking-wider">Laanta & Shaqaalaha</th>
+                                    <th class="p-4 font-black uppercase tracking-wider">Badeecada</th>
+                                    <th class="p-4 font-black uppercase tracking-wider text-right">Lacagta ($)</th>
+                                </tr>
+                            </thead>
+                            <tbody id="reportTableBody" class="divide-y divide-slate-100 text-sm md:text-base text-slate-800 bg-white">
+                                <tr><td colspan="4" class="p-10 text-center font-bold text-slate-400"><i class="fa-solid fa-spinner fa-spin mr-2"></i> Wuu xisaabinayaa...</td></tr>
+                            </tbody>
+                        </table>
+                        
+                        <div class="mt-auto bg-slate-800 border-t-4 border-blue-500 p-4 md:p-6 flex justify-between items-center shrink-0">
+                            <span class="font-black text-white text-sm md:text-xl uppercase tracking-wider label-period">Maanta:</span>
+                            <span class="font-black text-green-400 text-3xl md:text-4xl tracking-tighter" id="reportFilteredTotal">$0.00</span>
+                        </div>
+                    </div>
+                </div>
+            </div>
+
+        </main>
+    </div>
+
+    <nav class="md:hidden fixed bottom-0 left-0 w-full bg-white/95 backdrop-blur-md border-t border-slate-200 flex justify-around items-center h-[72px] pb-safe shadow-[0_-10px_30px_rgba(0,0,0,0.05)] z-50">
+        <a href="#dashboard" class="nav-link mobile-nav flex-1 h-full flex flex-col items-center justify-center gap-1 transition-all">
+            <i class="fa-solid fa-border-all text-xl mb-0.5"></i>
+            <span class="text-[10px] font-black uppercase tracking-widest">Xogta</span>
+        </a>
+        <a href="#branches" class="nav-link mobile-nav flex-1 h-full flex flex-col items-center justify-center gap-1 transition-all">
+            <i class="fa-solid fa-building-columns text-xl mb-0.5"></i>
+            <span class="text-[10px] font-black uppercase tracking-widest">Laamaha</span>
+        </a>
+        <a href="#staff" class="nav-link mobile-nav flex-1 h-full flex flex-col items-center justify-center gap-1 transition-all">
+            <i class="fa-solid fa-users text-xl mb-0.5"></i>
+            <span class="text-[10px] font-black uppercase tracking-widest">Shaqaale</span>
+        </a>
+        <a href="#reports" class="nav-link mobile-nav flex-1 h-full flex flex-col items-center justify-center gap-1 transition-all">
+            <i class="fa-solid fa-file-invoice-dollar text-xl mb-0.5"></i>
+            <span class="text-[10px] font-black uppercase tracking-widest">Shaxda</span>
+        </a>
+    </nav>
+
+    <script type="module">
+        import { initializeApp } from "https://www.gstatic.com/firebasejs/10.8.1/firebase-app.js";
+        import { getFirestore, collection, onSnapshot, query, orderBy, getDocs } 
+               from "https://www.gstatic.com/firebasejs/10.8.1/firebase-firestore.js";
+
+        const firebaseConfig = {
+            apiKey: "AIzaSyD060i4UPLxFL-nw5PhkvhD3n1Uf8-qH9g",
+            authDomain: "biyokaab.firebaseapp.com",
+            databaseURL: "https://biyokaab-default-rtdb.firebaseio.com",
+            projectId: "biyokaab",
+            storageBucket: "biyokaab.firebasestorage.app",
+            messagingSenderId: "485044523300",
+            appId: "1:485044523300:web:cfb9b5abf22ef6b3bba3b1"
+        };
+
+        const app = initializeApp(firebaseConfig);
+        const db = getFirestore(app);
+
+        // Saacadda
+        setInterval(() => {
+            const now = new Date();
+            document.getElementById('liveClock').innerText = now.toLocaleDateString('en-GB') + ' - ' + now.toLocaleTimeString('en-US');
+        }, 1000);
+
+        // Core Data
+        let allKnownBranches = []; 
+        let rawSales = []; // Dhammaan xogta Database-ka
+        let filteredSales = []; // Xogta la shaandheeyay (Time-filtered)
+        
+        let aggregatedBranches = {};
+        let aggregatedStaff = {};
+        
+        let currentPeriodLabel = "Maanta";
+
+        // Login & Init
+        window.addEventListener('DOMContentLoaded', () => {
+            if (localStorage.getItem('controlRoomAdmin') === 'true') {
+                document.getElementById('loginScreen').classList.add('hidden');
+                loadBranchesForFilters();
+            }
+        });
+
+        window.addEventListener('hashchange', handleRouting);
+
+        document.getElementById('loginForm').addEventListener('submit', (e) => {
+            e.preventDefault();
+            if (document.getElementById('adminPassword').value === '4419076') {
+                localStorage.setItem('controlRoomAdmin', 'true');
+                document.getElementById('loginScreen').classList.add('hidden');
+                loadBranchesForFilters();
+            } else {
+                document.getElementById('loginError').classList.remove('hidden');
+                setTimeout(() => document.getElementById('loginError').classList.add('hidden'), 3000);
+            }
+        });
+
+        window.logoutAdmin = function() {
+            localStorage.removeItem('controlRoomAdmin');
+            location.hash = '';
+            location.reload();
+        }
+
+        // --- Nidaamka URL Hash Routing ---
+        function handleRouting() {
+            const hash = window.location.hash || '#dashboard';
+            
+            document.querySelectorAll('.tab-content').forEach(el => el.classList.remove('active'));
+            document.querySelectorAll('.nav-link').forEach(btn => {
+                if (btn.classList.contains('mobile-nav')) {
+                    btn.classList.remove('text-blue-600');
+                    btn.classList.add('text-slate-400');
+                } else {
+                    btn.classList.remove('bg-blue-50', 'text-blue-700', 'border-l-4', 'border-blue-600');
+                    btn.classList.add('text-slate-600', 'hover:bg-slate-50');
+                }
+            });
+
+            if (hash.startsWith('#staff-details/')) {
+                const staffName = decodeURIComponent(hash.split('/')[1]);
+                document.getElementById('staff-details').classList.add('active');
+                highlightNav('#staff');
+                renderStaffDetails(staffName);
+            } 
+            else if (hash.startsWith('#branch-details/')) {
+                const branchName = decodeURIComponent(hash.split('/')[1]);
+                document.getElementById('branch-details').classList.add('active');
+                highlightNav('#branches');
+                renderBranchDetails(branchName);
+            }
+            else {
+                const targetEl = document.querySelector(hash);
+                if (targetEl) targetEl.classList.add('active');
+                highlightNav(hash);
+                if(hash === '#reports') generateReport();
+            }
+        }
+
+        function highlightNav(hash) {
+            document.querySelectorAll(`a[href="${hash}"]`).forEach(linkEl => {
+                if (linkEl.classList.contains('mobile-nav')) {
+                    linkEl.classList.remove('text-slate-400');
+                    linkEl.classList.add('text-blue-600');
+                } else {
+                    linkEl.classList.add('bg-blue-50', 'text-blue-700', 'border-l-4', 'border-blue-600');
+                    linkEl.classList.remove('text-slate-600', 'hover:bg-slate-50');
+                }
+            });
+        }
+
+        // --- Nidaamka Shaandhaynta Guud (GLOBAL FILTERS) ---
+        const formatYMD = (date) => {
+            const year = date.getFullYear();
+            const month = String(date.getMonth() + 1).padStart(2, '0');
+            const day = String(date.getDate()).padStart(2, '0');
+            return `${year}-${month}-${day}`;
+        };
+
+        window.setQuickDate = function(range) {
+            const today = new Date();
+            let startDate = new Date();
+            let endDate = new Date();
+
+            if (range === 'today') {
+                currentPeriodLabel = "Maanta";
+            } else if (range === 'yesterday') {
+                startDate.setDate(today.getDate() - 1);
+                endDate.setDate(today.getDate() - 1);
+                currentPeriodLabel = "Shalay";
+            } else if (range === 'week') {
+                startDate.setDate(today.getDate() - 6);
+                currentPeriodLabel = "Todobaadkan";
+            } else if (range === 'month') {
+                startDate.setDate(1); 
+                currentPeriodLabel = "Bishan";
+            } else if (range === 'all') {
+                document.getElementById('gStartDate').value = "";
+                document.getElementById('gEndDate').value = "";
+                currentPeriodLabel = "Dhammaan Waqtiga";
+                updateActiveTag('all');
+                applyGlobalFilters();
+                return;
+            }
+
+            document.getElementById('gStartDate').value = formatYMD(startDate);
+            document.getElementById('gEndDate').value = formatYMD(endDate);
+            updateActiveTag(range);
+            applyGlobalFilters();
+        }
+
+        window.applyCustomDate = function() {
+            currentPeriodLabel = "La Doortay";
+            updateActiveTag('');
+            applyGlobalFilters();
+        }
+
+        function updateActiveTag(range) {
+            document.querySelectorAll('.date-tag').forEach(tag => {
+                tag.classList.remove('bg-blue-100', 'border-blue-500', 'text-blue-800');
+                tag.classList.add('bg-white', 'border-slate-200', 'text-slate-600');
+            });
+            if(range) {
+                const activeTag = document.getElementById('tag-' + range);
+                if(activeTag) {
+                    activeTag.classList.remove('bg-white', 'border-slate-200', 'text-slate-600');
+                    activeTag.classList.add('bg-blue-100', 'border-blue-500', 'text-blue-800');
+                }
+            }
+        }
+
+        function updateLabels() {
+            document.querySelectorAll('.label-period').forEach(el => el.innerText = currentPeriodLabel);
+            document.getElementById('sidebarDateRange').innerText = currentPeriodLabel;
+        }
+
+        // --- Soo akhrinta Data-da ---
+        async function loadBranchesForFilters() {
+            try {
+                const docSnap = await getDocs(collection(db, "branches"));
+                const select = document.getElementById('repFilterBranch');
+                
+                docSnap.forEach(doc => {
+                    if(doc.id === "2Q0Fwntej1UMUiosOdxs" && doc.data().name) {
+                        allKnownBranches = doc.data().name;
+                        allKnownBranches.forEach(b => {
+                            select.innerHTML += `<option value="${b}">${b}</option>`;
+                        });
+                    }
+                });
+                
+                startLiveMonitoring();
+            } catch (e) { console.error(e); }
+        }
+
+        function startLiveMonitoring() {
+            const qSales = query(collection(db, "sales"), orderBy("systemTimestamp", "desc"));
+            onSnapshot(qSales, (snapshot) => {
+                rawSales = [];
+                snapshot.forEach(doc => rawSales.push({ id: doc.id, ...doc.data() }));
+                
+                // Set default to today if inputs are empty on first load
+                if(!document.getElementById('gStartDate').value && !document.getElementById('gEndDate').value) {
+                    setQuickDate('today'); 
+                } else {
+                    applyGlobalFilters();
+                }
+            });
+        }
+
+        function applyGlobalFilters() {
+            const start = document.getElementById('gStartDate').value;
+            const end = document.getElementById('gEndDate').value;
+            
+            filteredSales = rawSales.filter(sale => {
+                let show = true;
+                if(start && sale.saleDateString < start) show = false;
+                if(end && sale.saleDateString > end) show = false;
+                return show;
+            });
+
+            processData();
+            updateLabels();
+            updateAllViews();
+        }
+
+        function processData() {
+            aggregatedBranches = {};
+            aggregatedStaff = {};
+
+            // Qari Dhammaan laamaha iyagoo $0 ah (Si aanay meesha uga bixin)
+            allKnownBranches.forEach(b => {
+                aggregatedBranches[b] = { revTotal: 0, count: 0, staff: new Set() };
+            });
+
+            filteredSales.forEach(sale => {
+                const total = parseFloat(sale.total) || 0;
+                const branch = sale.branchName || "Lama Yaqaan";
+                const staff = sale.staffName || "Lama Yaqaan";
+
+                if(!aggregatedBranches[branch]) {
+                    aggregatedBranches[branch] = { revTotal:0, count:0, staff:new Set() };
+                }
+                
+                aggregatedBranches[branch].revTotal += total;
+                aggregatedBranches[branch].count += 1;
+                aggregatedBranches[branch].staff.add(staff);
+
+                if(!aggregatedStaff[staff]) aggregatedStaff[staff] = { rev:0, branch: branch, count: 0 };
+                aggregatedStaff[staff].rev += total;
+                aggregatedStaff[staff].count += 1;
+            });
+        }
+
+        function updateAllViews() {
+            updateDashboard();
+            updateBranchesPanel();
+            updateStaffPanel();
+            
+            const hash = window.location.hash;
+            if(hash.startsWith('#staff-details/')) {
+                renderStaffDetails(decodeURIComponent(hash.split('/')[1]));
+            } else if (hash.startsWith('#branch-details/')) {
+                renderBranchDetails(decodeURIComponent(hash.split('/')[1]));
+            }
+            if(hash === '#reports') generateReport();
+            
+            handleRouting(); // Hubi UI
+        }
+
+        // --- VIEWS ---
+
+        function updateDashboard() {
+            let totalRev = 0, totalStaff = new Set();
+            for(let b in aggregatedBranches) {
+                totalRev += aggregatedBranches[b].revTotal;
+                aggregatedBranches[b].staff.forEach(s => totalStaff.add(s));
+            }
+
+            document.getElementById('dashTotalRev').innerText = fm(totalRev);
+            document.getElementById('dashSalesCount').innerText = filteredSales.length;
+            document.getElementById('dashStaffCount').innerText = totalStaff.size;
+
+            // Live Feed (Latest 15 from filtered)
+            const feedContainer = document.getElementById('cctvFeedList');
+            let html = '';
+            const latest = filteredSales.slice(0, 15);
+            
+            if(latest.length === 0) {
+                feedContainer.innerHTML = `<div class="text-slate-400 text-center font-bold text-lg mt-8">Wax iib ah ma jiraan waqtigan.</div>`;
+                return;
+            }
+
+            latest.forEach(sale => {
+                html += `
+                    <div class="bg-white border hover:border-blue-300 transition rounded-xl p-3 md:p-4 flex justify-between items-center shadow-sm">
+                        <div class="w-20 md:w-28 text-slate-500 font-bold border-r border-slate-100 pr-2 md:pr-4 text-xs md:text-sm">${sale.saleDateString}</div>
+                        <div class="flex-1 px-3 md:px-6 overflow-hidden">
+                            <p class="text-slate-900 font-black text-sm md:text-lg uppercase truncate">${sale.branchName}</p>
+                            <a href="#staff-details/${encodeURIComponent(sale.staffName)}" class="text-slate-500 hover:text-blue-600 font-bold text-xs md:text-sm inline-block transition truncate">${sale.staffName}</a>
+                        </div>
+                        <div class="text-right">
+                            <p class="text-emerald-600 font-black text-lg md:text-xl">${fm(sale.total)}</p>
+                        </div>
+                    </div>
+                `;
+            });
+            feedContainer.innerHTML = html;
+        }
+
+        function updateBranchesPanel() {
+            const bContainer = document.getElementById('branchCardsContainer');
+            let bHtml = '';
+            for(let [name, data] of Object.entries(aggregatedBranches)) {
+                if(name === 'undefined') continue;
+                
+                const bgHeader = data.revTotal > 0 ? "bg-blue-50 border-blue-200" : "bg-slate-50 border-slate-200";
+                const textHeader = data.revTotal > 0 ? "text-blue-800" : "text-slate-600";
+                
+                bHtml += `
+                    <div class="white-card border-2 border-slate-100 overflow-hidden hover:shadow-lg hover:border-blue-300 transition duration-300 flex flex-col">
+                        <div class="${bgHeader} border-b p-4 md:p-5 flex justify-between items-center">
+                            <h3 class="text-lg md:text-xl font-black ${textHeader} uppercase truncate pr-2">${name}</h3>
+                            <a href="#branch-details/${encodeURIComponent(name)}" class="bg-white border border-slate-300 text-slate-600 hover:text-blue-600 hover:border-blue-400 px-3 py-1.5 rounded-lg text-xs md:text-sm font-bold shadow-sm transition whitespace-nowrap">
+                                <i class="fa-solid fa-eye"></i> Arag
+                            </a>
+                        </div>
+                        <div class="p-4 md:p-5 grid grid-cols-2 gap-3 md:gap-4 flex-1">
+                            <div class="bg-slate-50 p-3 md:p-4 rounded-xl border border-slate-100 col-span-2">
+                                <p class="text-slate-400 font-bold mb-1 text-xs uppercase tracking-wider">Wadarta Muddada</p>
+                                <p class="text-2xl md:text-3xl font-black text-emerald-600">${fm(data.revTotal)}</p>
+                            </div>
+                            <div class="bg-slate-50 p-3 rounded-xl border border-slate-100">
+                                <p class="text-slate-400 font-bold mb-1 text-[10px] md:text-xs uppercase tracking-wider">Tirada Iibka</p>
+                                <p class="text-lg font-bold text-slate-800">${data.count}</p>
+                            </div>
+                            <div class="bg-slate-50 p-3 rounded-xl border border-slate-100">
+                                <p class="text-slate-400 font-bold mb-1 text-[10px] md:text-xs uppercase tracking-wider">Shaqaale</p>
+                                <p class="text-lg font-bold text-slate-800">${data.staff.size}</p>
+                            </div>
+                        </div>
+                    </div>
+                `;
+            }
+            bContainer.innerHTML = bHtml;
+        }
+
+        window.renderBranchDetails = function(branchName) {
+            document.getElementById('bd-name').innerText = branchName;
+            
+            const mySales = filteredSales.filter(sale => sale.branchName === branchName);
+            
+            let totalAmt = 0;
+            let staffSet = new Set();
+            
+            let tableHtml = '';
+            mySales.forEach(sale => {
+                totalAmt += parseFloat(sale.total) || 0;
+                staffSet.add(sale.staffName);
+                tableHtml += `
+                    <tr class="hover:bg-blue-50/30 transition border-b border-slate-100">
+                        <td class="p-4 font-bold text-slate-500">${sale.saleDateString || '-'}</td>
+                        <td class="p-4 font-black text-slate-800">
+                            <a href="#staff-details/${encodeURIComponent(sale.staffName)}" class="hover:text-blue-600 transition">${sale.staffName}</a>
+                        </td>
+                        <td class="p-4 text-slate-600 font-bold text-sm uppercase">${sale.productName} (${sale.quantity})</td>
+                        <td class="p-4 text-right font-black text-emerald-600 text-lg">${fm(sale.total)}</td>
+                    </tr>
+                `;
+            });
+
+            if(tableHtml === '') tableHtml = `<tr><td colspan="4" class="p-10 text-center font-bold text-slate-400">Wax iib ah lagama diiwaangelin laantan muddadan.</td></tr>`;
+
+            document.getElementById('bd-total-amount').innerText = fm(totalAmt);
+            document.getElementById('bd-total-count').innerText = mySales.length;
+            document.getElementById('bd-staff-count').innerText = staffSet.size;
+            document.getElementById('bd-table-body').innerHTML = tableHtml;
+        }
+
+        function updateStaffPanel() {
+            const sortedStaff = Object.entries(aggregatedStaff).sort((a,b) => b[1].rev - a[1].rev);
+            
+            let tableHtml = '';
+            let rank = 1;
+            sortedStaff.forEach(([name, data]) => {
+                tableHtml += `
+                    <tr class="hover:bg-blue-50/50 transition border-b border-slate-100">
+                        <td class="p-4 md:p-5 font-black text-slate-900 text-sm md:text-lg flex items-center gap-3 uppercase">
+                            <span class="text-slate-400 text-xs w-4">${rank}.</span>
+                            ${name}
+                        </td>
+                        <td class="p-4 md:p-5 text-slate-500 font-bold text-xs md:text-sm uppercase">${data.branch}</td>
+                        <td class="p-4 md:p-5 text-right text-emerald-600 font-black text-lg md:text-2xl">${fm(data.rev)}</td>
+                        <td class="p-4 md:p-5 text-center">
+                            <a href="#staff-details/${encodeURIComponent(name)}" class="bg-white border border-slate-200 text-blue-600 hover:bg-blue-600 hover:text-white hover:border-blue-600 px-3 py-2 rounded-lg font-bold text-xs md:text-sm transition shadow-sm inline-block">
+                                Arag Xogtiisa
+                            </a>
+                        </td>
+                    </tr>
+                `;
+                rank++;
+            });
+            if(tableHtml === '') tableHtml = '<tr><td colspan="4" class="p-10 text-center text-slate-400 font-bold text-lg">Xogta Shaqaalaha Lama Helin</td></tr>';
+            document.getElementById('allStaffTableBody').innerHTML = tableHtml;
+        }
+
+        window.renderStaffDetails = function(staffName) {
+            document.getElementById('sd-name').innerText = staffName;
+            
+            const mySales = filteredSales.filter(sale => sale.staffName === staffName);
+            
+            let totalAmt = 0;
+            let branchName = "Lama yaqaan";
+            if (mySales.length > 0) branchName = mySales[0].branchName; 
+            
+            let tableHtml = '';
+            mySales.forEach(sale => {
+                totalAmt += parseFloat(sale.total) || 0;
+                tableHtml += `
+                    <tr class="hover:bg-slate-50 transition border-b border-slate-100">
+                        <td class="p-4 font-bold text-slate-500">${sale.saleDateString || '-'}</td>
+                        <td class="p-4 font-black text-slate-800 uppercase">${sale.productName}</td>
+                        <td class="p-4 text-center font-bold text-blue-600 bg-blue-50/30">${sale.quantity}</td>
+                        <td class="p-4 text-right font-black text-emerald-600 text-lg md:text-xl">${fm(sale.total)}</td>
+                    </tr>
+                `;
+            });
+
+            if(tableHtml === '') tableHtml = `<tr><td colspan="4" class="p-10 text-center font-bold text-slate-400">Wax iib ah ma uusan samaynin muddadan.</td></tr>`;
+
+            document.getElementById('sd-branch').innerText = branchName;
+            document.getElementById('sd-total-amount').innerText = fm(totalAmt);
+            document.getElementById('sd-total-count').innerText = mySales.length;
+            document.getElementById('sd-table-body').innerHTML = tableHtml;
+        }
+
+        window.generateReport = function() {
+            const branch = document.getElementById('repFilterBranch').value;
+            const tbody = document.getElementById('reportTableBody');
+            
+            let total = 0;
+            let html = '';
+
+            filteredSales.forEach(sale => {
+                let show = true;
+                if(branch !== "ALL" && sale.branchName !== branch) show = false;
+
+                if(show) {
+                    total += parseFloat(sale.total) || 0;
+                    html += `
+                        <tr class="hover:bg-slate-50 transition border-b border-slate-100">
+                            <td class="p-4 md:p-5 font-bold text-slate-500">${sale.saleDateString || '-'}</td>
+                            <td class="p-4 md:p-5">
+                                <span class="block font-black text-slate-900 text-sm md:text-lg uppercase">${sale.branchName}</span>
+                                <a href="#staff-details/${encodeURIComponent(sale.staffName)}" class="text-slate-500 hover:text-blue-600 font-bold transition text-xs md:text-sm">${sale.staffName}</a>
+                            </td>
+                            <td class="p-4 md:p-5 font-bold text-slate-800 text-xs md:text-sm uppercase">
+                                ${sale.productName} <br>
+                                <span class="text-blue-600 font-black text-[10px] md:text-xs">Tirada: ${sale.quantity}</span>
+                            </td>
+                            <td class="p-4 md:p-5 text-right text-emerald-600 font-black text-lg md:text-2xl">${fm(sale.total)}</td>
+                        </tr>
+                    `;
+                }
+            });
+
+            if(html === '') html = '<tr><td colspan="4" class="p-10 text-center font-bold text-slate-400 text-lg">Wax xog ah lagama helin raadintaada...</td></tr>';
+            
+            tbody.innerHTML = html;
+            document.getElementById('reportFilteredTotal').innerText = fm(total);
+        }
+
+        function fm(amount) {
+            return '$' + Number(amount).toLocaleString('en-US', { minimumFractionDigits: 2, maximumFractionDigits: 2 });
+        }
+
+    </script>
+</body>
+</html>
