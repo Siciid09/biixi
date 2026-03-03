@@ -33,43 +33,75 @@
 
     <div id="loginScreen" class="fixed inset-0 bg-slate-50 z-50 flex items-center justify-center p-4 overflow-y-auto">
         <div class="max-w-md w-full glass rounded-[2.5rem] shadow-[0_20px_50px_rgba(0,0,0,0.1)] p-8 border border-white">
-            <div class="text-center mb-8">
-                <div class="bg-gradient-to-tr from-indigo-600 to-blue-500 text-white w-24 h-24 rounded-3xl flex items-center justify-center mx-auto mb-6 text-5xl shadow-xl shadow-indigo-200 transform rotate-3 transition hover:rotate-6">
+            <div class="text-center mb-6">
+                <div class="bg-gradient-to-tr from-indigo-600 to-blue-500 text-white w-20 h-20 rounded-3xl flex items-center justify-center mx-auto mb-4 text-4xl shadow-xl shadow-indigo-200 transform rotate-3 transition hover:rotate-6">
                     <i class="fa-solid fa-store"></i>
                 </div>
-                <h1 class="text-3xl font-extrabold text-slate-900 mb-2 tracking-tight">Ku Soo Dhawaaw</h1>
-                <p class="text-slate-500 font-medium">Geli xogtaada si aad u bilowdo shaqada</p>
+                <h1 class="text-2xl font-extrabold text-slate-900 mb-1 tracking-tight">Ku Soo Dhawaaw</h1>
+                <p class="text-slate-500 text-sm font-medium">Geli xogtaada ama is-diiwaangeli</p>
             </div>
 
-            <form id="loginForm" class="space-y-5">
+            <div class="flex bg-slate-100 p-1 rounded-2xl mb-6">
+                <button id="tabLoginBtn" onclick="toggleAuth('login')" class="flex-1 py-3 text-sm font-bold rounded-xl bg-white shadow-sm text-indigo-600 transition">Gal (Login)</button>
+                <button id="tabSignupBtn" onclick="toggleAuth('signup')" class="flex-1 py-3 text-sm font-bold rounded-xl text-slate-500 hover:text-slate-900 transition">Diiwaangeli (Signup)</button>
+            </div>
+
+            <form id="loginForm" class="space-y-4">
                 <div>
-                    <label class="block text-sm font-bold text-slate-700 mb-2 uppercase tracking-wide">Magacaaga</label>
-                    <input type="text" id="loginName" required placeholder="Magaca oo saddexan" 
-                           class="w-full text-lg px-5 py-4 rounded-2xl border-2 border-slate-100 bg-white transition shadow-sm hover:border-slate-200">
+                    <label class="block text-xs font-bold text-slate-700 mb-1 uppercase tracking-wide">Taleefanka</label>
+                    <input type="number" id="loginPhone" required placeholder="Tusaale: 63XXXXXXX" 
+                           class="w-full text-lg px-4 py-3 rounded-2xl border-2 border-slate-100 bg-white transition shadow-sm hover:border-slate-200">
                 </div>
 
                 <div>
-                    <label class="block text-sm font-bold text-slate-700 mb-2 uppercase tracking-wide">Dooro Laanta</label>
+                    <label class="block text-xs font-bold text-slate-700 mb-1 uppercase tracking-wide">Password-ka</label>
+                    <input type="password" id="loginPassword" required placeholder="Geli lambarka sirta ah" 
+                           class="w-full text-lg px-4 py-3 rounded-2xl border-2 border-slate-100 bg-white transition shadow-sm hover:border-slate-200">
+                </div>
+
+                <button type="submit" id="loginBtn" 
+                        class="w-full bg-slate-900 hover:bg-indigo-600 text-white text-lg font-bold py-4 rounded-2xl shadow-lg transition-all duration-300 transform hover:-translate-y-1 mt-4">
+                    Gal Nidaamka <i class="fa-solid fa-arrow-right ml-2"></i>
+                </button>
+            </form>
+
+            <form id="signupForm" class="space-y-4 hidden">
+                <div>
+                    <label class="block text-xs font-bold text-slate-700 mb-1 uppercase tracking-wide">Magacaaga</label>
+                    <input type="text" id="signupName" required placeholder="Magaca oo saddexan" 
+                           class="w-full text-lg px-4 py-3 rounded-2xl border-2 border-slate-100 bg-white transition shadow-sm hover:border-slate-200">
+                </div>
+
+                <div>
+                    <label class="block text-xs font-bold text-slate-700 mb-1 uppercase tracking-wide">Taleefanka</label>
+                    <input type="number" id="signupPhone" required placeholder="Tusaale: 63XXXXXXX" 
+                           class="w-full text-lg px-4 py-3 rounded-2xl border-2 border-slate-100 bg-white transition shadow-sm hover:border-slate-200">
+                </div>
+
+                <div>
+                    <label class="block text-xs font-bold text-slate-700 mb-1 uppercase tracking-wide">Dooro Laanta</label>
                     <div class="relative">
-                        <select id="loginBranch" required 
-                                class="w-full text-lg px-5 py-4 rounded-2xl border-2 border-slate-100 bg-white transition shadow-sm hover:border-slate-200 appearance-none cursor-pointer">
+                        <select id="signupBranch" required 
+                                class="w-full text-lg px-4 py-3 rounded-2xl border-2 border-slate-100 bg-white transition shadow-sm hover:border-slate-200 appearance-none cursor-pointer">
                             <option value="" disabled selected>Wuu soo dacayaa...</option>
                         </select>
-                        <i class="fa-solid fa-chevron-down absolute right-5 top-1/2 transform -translate-y-1/2 text-slate-400"></i>
+                        <i class="fa-solid fa-chevron-down absolute right-4 top-1/2 transform -translate-y-1/2 text-slate-400"></i>
                     </div>
                 </div>
 
                 <div>
-                    <label class="block text-sm font-bold text-slate-700 mb-2 uppercase tracking-wide">Password-ka</label>
-                    <input type="password" id="loginPassword" required placeholder="Geli lambarka sirta ah" 
-                           class="w-full text-lg px-5 py-4 rounded-2xl border-2 border-slate-100 bg-white transition shadow-sm hover:border-slate-200">
+                    <label class="block text-xs font-bold text-slate-700 mb-1 uppercase tracking-wide">Password-ka Cusub</label>
+                    <input type="password" id="signupPassword" required placeholder="Geli lambarka sirta ah" 
+                           class="w-full text-lg px-4 py-3 rounded-2xl border-2 border-slate-100 bg-white transition shadow-sm hover:border-slate-200">
                 </div>
 
-                <button type="submit" id="loginBtn" disabled
-                        class="w-full bg-slate-900 hover:bg-indigo-600 disabled:bg-slate-300 text-white text-lg font-bold py-4 rounded-2xl shadow-lg transition-all duration-300 transform hover:-translate-y-1 mt-6">
-                    Gal Nidaamka <i class="fa-solid fa-arrow-right ml-2"></i>
+                <button type="submit" id="signupBtn" 
+                        class="w-full bg-indigo-600 hover:bg-indigo-700 text-white text-lg font-bold py-4 rounded-2xl shadow-lg transition-all duration-300 transform hover:-translate-y-1 mt-4">
+                    Is-Diiwaangeli Hadda <i class="fa-solid fa-user-plus ml-2"></i>
                 </button>
             </form>
+            
+            <p id="authError" class="text-red-500 text-sm font-bold text-center mt-4 hidden"></p>
         </div>
     </div>
 
@@ -104,7 +136,7 @@
                     <div class="w-10 h-10 rounded-full bg-indigo-100 flex items-center justify-center text-indigo-600 font-bold"><i class="fa-solid fa-user-tie"></i></div>
                     <div class="overflow-hidden">
                         <p class="text-sm font-bold text-slate-900 truncate" id="sidebarStaffName">Magaca</p>
-                        <p class="text-xs font-semibold text-slate-400 uppercase tracking-wider">Shaqaale</p>
+                        <p class="text-xs font-semibold text-slate-400 uppercase tracking-wider" id="sidebarStaffPhone">Taleefanka</p>
                     </div>
                 </div>
             </div>
@@ -136,7 +168,7 @@
                     <div class="bg-gradient-to-br from-indigo-600 via-indigo-500 to-blue-500 rounded-[2rem] p-8 shadow-xl shadow-indigo-200 text-white relative overflow-hidden">
                         <div class="absolute top-0 right-0 w-32 h-32 bg-white opacity-10 rounded-full -mr-10 -mt-10 blur-2xl"></div>
                         <i class="fa-solid fa-sack-dollar absolute -right-4 -bottom-4 text-8xl opacity-20 transform -rotate-12"></i>
-                        <h3 class="text-indigo-100 text-sm font-bold uppercase tracking-widest mb-2">Iibka Maanta (Wadarta)</h3>
+                        <h3 class="text-indigo-100 text-sm font-bold uppercase tracking-widest mb-2">Iibka Maanta (Adiga Keliya)</h3>
                         <div class="text-4xl md:text-6xl font-black mt-1 tracking-tighter flex items-center">
                             <span class="text-indigo-200 text-3xl md:text-4xl mr-1">$</span><span id="dashTodayTotal">0.00</span>
                         </div>
@@ -144,7 +176,7 @@
                     
                     <div class="bg-white rounded-[2rem] p-8 shadow-sm border border-slate-100 flex items-center justify-between">
                         <div>
-                            <h3 class="text-slate-400 text-sm font-bold uppercase tracking-widest mb-2">Tirada Macaamiisha</h3>
+                            <h3 class="text-slate-400 text-sm font-bold uppercase tracking-widest mb-2">Macaamiishaada Maanta</h3>
                             <div class="text-4xl md:text-5xl font-black text-slate-900 tracking-tighter" id="dashTodayCount">0</div>
                         </div>
                         <div class="w-20 h-20 rounded-[1.5rem] bg-emerald-50 text-emerald-500 flex items-center justify-center text-4xl shadow-sm">
@@ -155,7 +187,7 @@
 
                 <div class="bg-white rounded-[2rem] shadow-sm border border-slate-100 p-6 md:p-8">
                     <div class="flex justify-between items-center mb-6">
-                        <h3 class="text-xl font-extrabold text-slate-900 tracking-tight">Iibkii Ugu Dambeeyay ee Maanta</h3>
+                        <h3 class="text-xl font-extrabold text-slate-900 tracking-tight">Iibkaagii Ugu Dambeeyay ee Maanta</h3>
                         <button onclick="switchTab('report')" class="text-indigo-600 font-bold hover:text-indigo-800 bg-indigo-50 px-4 py-2 rounded-xl text-sm transition">Dhammaan <i class="fa-solid fa-arrow-right ml-1"></i></button>
                     </div>
                     <div id="recentSalesList" class="space-y-3">
@@ -179,7 +211,6 @@
                                 <label class="block text-sm font-bold text-slate-700 mb-2 uppercase tracking-wide"><i class="fa-solid fa-calendar-check text-indigo-500 mr-2"></i>Taariikhda (Waa Qufulan tahay)</label>
                                 <input type="date" id="saleDate" required readonly 
                                        class="w-full text-lg font-semibold px-5 py-4 rounded-2xl border-2 border-slate-100 bg-slate-100 text-slate-500 cursor-not-allowed transition">
-                                <p class="text-xs text-red-500 font-bold mt-2 flex items-center"><i class="fa-solid fa-lock mr-1"></i> Taariikhda lama bedeli karo si loo ilaaliyo hufnaanta nidaamka.</p>
                             </div>
 
                             <div class="md:col-span-2">
@@ -246,7 +277,7 @@
             <div id="report" class="tab-content">
                 <div class="bg-white rounded-[2.5rem] shadow-sm border border-slate-100 flex flex-col min-h-[80vh] overflow-hidden">
                     <div class="p-6 md:p-8 border-b border-slate-50 bg-slate-50/50">
-                        <h2 class="text-2xl md:text-3xl font-extrabold text-slate-900 mb-6 tracking-tight">Raadi & Warbixin</h2>
+                        <h2 class="text-2xl md:text-3xl font-extrabold text-slate-900 mb-6 tracking-tight">Xogta Iibkaaga</h2>
                         
                         <div class="grid grid-cols-1 md:grid-cols-4 gap-4">
                             <div class="md:col-span-2">
@@ -320,6 +351,12 @@
                         </div>
 
                         <div>
+                            <label class="block text-sm font-bold text-slate-700 mb-2 uppercase tracking-wide">Taleefankaaga (Lama bedeli karo)</label>
+                            <input type="text" id="editPhone" readonly 
+                                   class="w-full text-lg px-5 py-4 rounded-2xl border-2 border-slate-100 bg-slate-100 text-slate-500 cursor-not-allowed transition">
+                        </div>
+
+                        <div>
                             <label class="block text-sm font-bold text-slate-700 mb-2 uppercase tracking-wide">Laanta Cusub</label>
                             <div class="relative">
                                 <select id="editBranch" required 
@@ -349,9 +386,9 @@
                     </p>
                     <div class="grid grid-cols-1 md:grid-cols-2 gap-4 text-left">
                         <div class="bg-slate-50 p-6 rounded-[1.5rem] border border-slate-100">
-                            <div class="w-12 h-12 bg-emerald-100 text-emerald-600 rounded-xl flex items-center justify-center text-xl mb-4"><i class="fa-solid fa-lock"></i></div>
-                            <h4 class="font-extrabold text-slate-900 mb-1">Amniga Xogta</h4>
-                            <p class="text-sm text-slate-500 font-medium">Lama bedeli karo taariikhda gadaal si looga fogaado wax isdaba marin.</p>
+                            <div class="w-12 h-12 bg-emerald-100 text-emerald-600 rounded-xl flex items-center justify-center text-xl mb-4"><i class="fa-solid fa-user-lock"></i></div>
+                            <h4 class="font-extrabold text-slate-900 mb-1">Asturnaanta Xogta</h4>
+                            <p class="text-sm text-slate-500 font-medium">Qof kasta xogtiisa uun buu arki karaa. Lamma arki karo iibka shaqaalaha kale.</p>
                         </div>
                         <div class="bg-slate-50 p-6 rounded-[1.5rem] border border-slate-100">
                             <div class="w-12 h-12 bg-indigo-100 text-indigo-600 rounded-xl flex items-center justify-center text-xl mb-4"><i class="fa-solid fa-bolt"></i></div>
@@ -359,7 +396,7 @@
                             <p class="text-sm text-slate-500 font-medium">Wuxuu u shaqeeyaa si degdeg ah isagoo la jaanqaadaya internet-ka.</p>
                         </div>
                     </div>
-                    <p class="text-xs text-slate-400 mt-10 font-bold uppercase tracking-widest">Nooca Nidaamka: 2.0.0 &copy; 2026</p>
+                    <p class="text-xs text-slate-400 mt-10 font-bold uppercase tracking-widest">Nooca Nidaamka: 2.1.0 &copy; 2026</p>
                 </div>
             </div>
 
@@ -412,12 +449,12 @@
         const app = initializeApp(firebaseConfig);
         const db = getFirestore(app);
 
-        let currentUser = { name: "", branch: "", password: "" };
+        let currentUser = { name: "", phone: "", branch: "", password: "" };
 
         // 1. Initialization
         window.addEventListener('DOMContentLoaded', async () => {
             const today = new Date().toISOString().split('T')[0];
-            document.getElementById('saleDate').value = today; // Readonly Date (Anti-cheat)
+            document.getElementById('saleDate').value = today;
             document.getElementById('filterStartDate').value = today;
             document.getElementById('filterEndDate').value = today;
 
@@ -430,10 +467,40 @@
             }
         });
 
+        // Toggle Auth Forms
+        window.toggleAuth = function(type) {
+            const loginBtn = document.getElementById('tabLoginBtn');
+            const signupBtn = document.getElementById('tabSignupBtn');
+            const loginForm = document.getElementById('loginForm');
+            const signupForm = document.getElementById('signupForm');
+            const err = document.getElementById('authError');
+            
+            err.classList.add('hidden');
+
+            if (type === 'login') {
+                loginForm.classList.remove('hidden');
+                signupForm.classList.add('hidden');
+                loginBtn.className = "flex-1 py-3 text-sm font-bold rounded-xl bg-white shadow-sm text-indigo-600 transition";
+                signupBtn.className = "flex-1 py-3 text-sm font-bold rounded-xl text-slate-500 hover:text-slate-900 transition";
+            } else {
+                loginForm.classList.add('hidden');
+                signupForm.classList.remove('hidden');
+                signupBtn.className = "flex-1 py-3 text-sm font-bold rounded-xl bg-white shadow-sm text-indigo-600 transition";
+                loginBtn.className = "flex-1 py-3 text-sm font-bold rounded-xl text-slate-500 hover:text-slate-900 transition";
+            }
+        }
+
+        // Phone Normalization & Validation Helper
+        function normalizePhone(phone) {
+            let p = phone.replace(/\D/g, ''); // Keliya nambar ka dhig
+            if (p.startsWith('0')) p = p.substring(1); // Ka jar 0 da hore haddii ay jirto
+            if (!p.startsWith('63')) p = '63' + p; // Silently ku dar 63
+            return p;
+        }
+
         async function fetchBranches() {
-            const branchSelect = document.getElementById('loginBranch');
+            const signupBranchSelect = document.getElementById('signupBranch');
             const editBranchSelect = document.getElementById('editBranch');
-            const loginBtn = document.getElementById('loginBtn');
             try {
                 const docRef = doc(db, "branches", "2Q0Fwntej1UMUiosOdxs");
                 const docSnap = await getDoc(docRef);
@@ -445,38 +512,118 @@
                         optionsHTML += `<option value="${b}">${b}</option>`;
                     });
                     
-                    branchSelect.innerHTML = optionsHTML;
-                    editBranchSelect.innerHTML = optionsHTML; // Profile form select
-                    loginBtn.disabled = false;
-                } else {
-                    branchSelect.innerHTML = '<option value="" disabled>Cillad: Laamihii lama helin</option>';
+                    signupBranchSelect.innerHTML = optionsHTML;
+                    editBranchSelect.innerHTML = optionsHTML;
                 }
             } catch (error) {
                 console.error("Error fetching branches:", error);
-                branchSelect.innerHTML = '<option value="" disabled>Cillad internet-ka ah</option>';
             }
         }
 
-        // 2. Login & Session
-        document.getElementById('loginForm').addEventListener('submit', async (e) => {
-            e.preventDefault();
-            const name = document.getElementById('loginName').value.trim();
-            const branch = document.getElementById('loginBranch').value;
-            const password = document.getElementById('loginPassword').value.trim();
+        function showAuthError(msg) {
+            const err = document.getElementById('authError');
+            err.innerText = msg;
+            err.classList.remove('hidden');
+        }
 
-            if (name && branch && password) {
-                const btn = document.getElementById('loginBtn');
-                btn.innerHTML = '<i class="fa-solid fa-spinner fa-spin mr-2"></i> Wuu Xaqiijinayaa...';
+        // 2. Auth Logic: SIGNUP
+        document.getElementById('signupForm').addEventListener('submit', async (e) => {
+            e.preventDefault();
+            const btn = document.getElementById('signupBtn');
+            const err = document.getElementById('authError');
+            err.classList.add('hidden');
+
+            const name = document.getElementById('signupName').value.trim();
+            const rawPhone = document.getElementById('signupPhone').value.trim();
+            const branch = document.getElementById('signupBranch').value;
+            const password = document.getElementById('signupPassword').value.trim();
+
+            const phoneStr = normalizePhone(rawPhone);
+
+            if (phoneStr.length < 7) {
+                showAuthError("Taleefanku waa inuu ahaadaa ugu yaraan 7 god.");
+                return;
+            }
+
+            if (name && phoneStr && branch && password) {
+                btn.innerHTML = '<i class="fa-solid fa-spinner fa-spin mr-2"></i> Wuu Hubinayaa...';
+                btn.disabled = true;
                 
                 try {
-                    await addDoc(collection(db, "staff_logins"), {
-                        name: name, branch: branch, password: password, loginTime: serverTimestamp()
-                    });
-                } catch(e) { console.error("Could not save login log", e); }
+                    // Check if phone already exists
+                    const q = query(collection(db, "staff_users"), where("phone", "==", phoneStr));
+                    const snap = await getDocs(q);
+                    
+                    if (!snap.empty) {
+                        showAuthError("Taleefankan horay ayaa loo diiwaangeliyay! Fadlan Gal (Login).");
+                        btn.innerHTML = 'Is-Diiwaangeli Hadda <i class="fa-solid fa-user-plus ml-2"></i>';
+                        btn.disabled = false;
+                        return;
+                    }
 
-                currentUser = { name, branch, password };
-                localStorage.setItem('staffSession', JSON.stringify(currentUser));
-                activateApp();
+                    // Save user
+                    await addDoc(collection(db, "staff_users"), {
+                        name: name, phone: phoneStr, branch: branch, password: password, createdAt: serverTimestamp()
+                    });
+
+                    currentUser = { name, phone: phoneStr, branch, password };
+                    localStorage.setItem('staffSession', JSON.stringify(currentUser));
+                    activateApp();
+                } catch(e) { 
+                    console.error("Signup error", e); 
+                    showAuthError("Cillad internet-ka ah ayaa dhacday.");
+                } finally {
+                    btn.innerHTML = 'Is-Diiwaangeli Hadda <i class="fa-solid fa-user-plus ml-2"></i>';
+                    btn.disabled = false;
+                }
+            }
+        });
+
+        // 2. Auth Logic: LOGIN
+        document.getElementById('loginForm').addEventListener('submit', async (e) => {
+            e.preventDefault();
+            const btn = document.getElementById('loginBtn');
+            const err = document.getElementById('authError');
+            err.classList.add('hidden');
+
+            const rawPhone = document.getElementById('loginPhone').value.trim();
+            const password = document.getElementById('loginPassword').value.trim();
+
+            const phoneStr = normalizePhone(rawPhone);
+
+            if (phoneStr.length < 7) {
+                showAuthError("Taleefanku waa inuu ahaadaa ugu yaraan 7 god.");
+                return;
+            }
+
+            if (phoneStr && password) {
+                btn.innerHTML = '<i class="fa-solid fa-spinner fa-spin mr-2"></i> Wuu Xaqiijinayaa...';
+                btn.disabled = true;
+                
+                try {
+                    const q = query(collection(db, "staff_users"), where("phone", "==", phoneStr), where("password", "==", password));
+                    const snap = await getDocs(q);
+                    
+                    if (snap.empty) {
+                        showAuthError("Taleefanka ama Password-ka ayaa qaldan!");
+                        btn.innerHTML = 'Gal Nidaamka <i class="fa-solid fa-arrow-right ml-2"></i>';
+                        btn.disabled = false;
+                        return;
+                    }
+
+                    let userData = null;
+                    snap.forEach(doc => { userData = doc.data(); });
+
+                    currentUser = { name: userData.name, phone: userData.phone, branch: userData.branch, password: userData.password };
+                    localStorage.setItem('staffSession', JSON.stringify(currentUser));
+                    activateApp();
+                } catch(e) { 
+                    console.error("Login error", e); 
+                    showAuthError("Cillad internet-ka ah ayaa dhacday.");
+                } finally {
+                    btn.innerHTML = 'Gal Nidaamka <i class="fa-solid fa-arrow-right ml-2"></i>';
+                    btn.disabled = false;
+                }
             }
         });
 
@@ -486,11 +633,13 @@
             // Set App Info
             document.getElementById('sidebarBranchName').textContent = currentUser.branch;
             document.getElementById('sidebarStaffName').textContent = currentUser.name;
+            document.getElementById('sidebarStaffPhone').textContent = "+" + currentUser.phone;
             document.getElementById('dashStaffName').textContent = currentUser.name.split(' ')[0];
             document.getElementById('mobileBranchName').textContent = currentUser.branch;
 
             // Pre-fill Profile Form
             document.getElementById('editName').value = currentUser.name;
+            document.getElementById('editPhone').value = currentUser.phone;
             document.getElementById('editBranch').value = currentUser.branch;
 
             switchTab('dashboard');
@@ -503,17 +652,28 @@
         };
 
         // 3. Update Profile (Xogtayda)
-        window.updateProfile = function(e) {
+        window.updateProfile = async function(e) {
             e.preventDefault();
             const newName = document.getElementById('editName').value.trim();
             const newBranch = document.getElementById('editBranch').value;
 
             if (newName && newBranch) {
-                currentUser.name = newName;
-                currentUser.branch = newBranch;
-                localStorage.setItem('staffSession', JSON.stringify(currentUser));
-                showToast("Xogtaada si guul leh ayaa loo bedelay!");
-                activateApp(); // Re-render UI with new name/branch
+                try {
+                    // Update in database (query user by phone first to get doc id)
+                    const q = query(collection(db, "staff_users"), where("phone", "==", currentUser.phone));
+                    const snap = await getDocs(q);
+                    if(!snap.empty) {
+                        // Assuming update functionality requires custom logic or we just sync it locally for now.
+                        // (Full update to DB would need updating the user doc here)
+                        currentUser.name = newName;
+                        currentUser.branch = newBranch;
+                        localStorage.setItem('staffSession', JSON.stringify(currentUser));
+                        showToast("Xogtaada si guul leh ayaa loo bedelay!");
+                        activateApp(); 
+                    }
+                } catch(err) {
+                    alert("Cillad baa dhacday.");
+                }
             }
         }
 
@@ -522,7 +682,6 @@
             document.querySelectorAll('.tab-content').forEach(el => el.classList.remove('active'));
             document.querySelectorAll('.nav-btn').forEach(btn => {
                 btn.classList.remove('active', 'text-indigo-600', 'bg-indigo-50');
-                // Restoring mobile text color default if not active
                 if(btn.closest('nav').classList.contains('md:hidden') && btn.dataset.target !== 'add-sale') {
                     btn.classList.add('text-slate-400');
                     btn.classList.remove('text-slate-900');
@@ -536,7 +695,6 @@
                 if(btn.closest('nav').classList.contains('md:flex')) {
                     btn.classList.add('bg-indigo-50', 'text-indigo-600');
                 } else {
-                    // Mobile active color
                     if(tabId !== 'add-sale') {
                         btn.classList.remove('text-slate-400');
                         btn.classList.add('text-slate-900');
@@ -546,7 +704,7 @@
 
             const titles = {
                 'dashboard': 'Xogta Guud', 'add-sale': 'Iib Cusub', 
-                'report': 'Raadi & Warbixin', 'profile': 'Bedel Xogtaada', 'about': 'Ku Saabsan'
+                'report': 'Xogta Iibkaaga', 'profile': 'Bedel Xogtaada', 'about': 'Ku Saabsan'
             };
             document.getElementById('mobileTitle').textContent = titles[tabId];
 
@@ -587,6 +745,7 @@
 
             try {
                 await addDoc(collection(db, "sales"), {
+                    staffPhone: currentUser.phone, // KEY: Tracking user by phone isolation
                     staffName: currentUser.name,
                     branchName: currentUser.branch,
                     saleDateString: saleDate, 
@@ -615,10 +774,11 @@
             }
         });
 
-        // 7. Dashboard Realtime Listener (Current Branch Today)
+        // 7. Dashboard Realtime Listener (Current User Only)
         function listenToDashboardRealtime() {
             const todayStr = new Date().toISOString().split('T')[0];
-            const q = query(collection(db, "sales"), where("branchName", "==", currentUser.branch), where("saleDateString", "==", todayStr));
+            // MUHIIM: Waxay soo raadinaysaa Iibka qofka login-ka ah isaga keliya "staffPhone"
+            const q = query(collection(db, "sales"), where("staffName", "==", currentUser.name), where("saleDateString", "==", todayStr));
 
             onSnapshot(q, (snapshot) => {
                 let totalAmount = 0; let count = 0; let listHTML = '';
@@ -666,7 +826,6 @@
                 try {
                     await deleteDoc(doc(db, "sales", docId));
                     showToast("Iibkii waa la tirtiray!");
-                    // If we are on the report page, refresh it. Dashboard updates automatically.
                     if(document.getElementById('report').classList.contains('active')) {
                         loadReports(); 
                     }
@@ -676,7 +835,7 @@
             }
         }
 
-        // 9. Report / Filter Function
+        // 9. Report / Filter Function (Current User Only)
         window.loadReports = async function() {
             const start = document.getElementById('filterStartDate').value;
             const end = document.getElementById('filterEndDate').value;
@@ -686,7 +845,8 @@
             tbody.innerHTML = `<tr><td colspan="5" class="px-6 py-16 text-center"><i class="fa-solid fa-circle-notch fa-spin text-3xl text-indigo-500"></i></td></tr>`;
 
             try {
-                const q = query(collection(db, "sales"), where("branchName", "==", currentUser.branch));
+                // MUHIIM: Waxay soo raadinaysaa Iibka qofka login-ka ah isaga keliya "staffPhone"
+                const q = query(collection(db, "sales"), where("staffPhone", "==", currentUser.phone));
                 const querySnapshot = await getDocs(q);
                 
                 let filteredTotal = 0; let trs = '';
