@@ -54,7 +54,7 @@
 
             <form id="loginForm" class="space-y-6">
                 <div>
-                    <input type="password" id="adminPassword" required placeholder="Lambar Sir ah..." 
+                    <input type="password" id="adminPassword" required placeholder="Lambar Sir ah..."
                            class="w-full text-center text-3xl font-black px-6 py-4 rounded-xl bg-slate-50 border-2 border-slate-300 text-slate-900 focus:border-blue-600 focus:outline-none transition tracking-widest">
                 </div>
                 <p id="loginError" class="text-red-600 font-bold hidden text-sm bg-red-50 p-3 rounded-lg"><i class="fa-solid fa-triangle-exclamation mr-1"></i> Sirtaadu waa khalad!</p>
@@ -228,7 +228,7 @@
 
             <div id="staff" class="tab-content">
                 <h2 class="text-2xl font-black text-slate-800 mb-6 flex items-center justify-between">
-                    Qiimaynta Shaqaalaha
+                    Shaqaalaha & Qiimayntooda
                     <span class="text-sm font-bold bg-blue-100 text-blue-800 px-3 py-1 rounded-full label-period">Maanta</span>
                 </h2>
                 
@@ -240,7 +240,7 @@
                                     <th class="p-4 font-black uppercase tracking-wider"># Magaca Shaqaalaha</th>
                                     <th class="p-4 font-black uppercase tracking-wider">Laanta</th>
                                     <th class="p-4 font-black uppercase tracking-wider text-right">Lacagta ($)</th>
-                                    <th class="p-4 font-black uppercase tracking-wider text-center">Faahfaahin</th>
+                                    <th class="p-4 font-black uppercase tracking-wider text-center">Tallaabo</th>
                                 </tr>
                             </thead>
                             <tbody id="allStaffTableBody" class="divide-y divide-slate-100 bg-white">
@@ -387,6 +387,7 @@
 
         // Core Data
         let allKnownBranches = []; 
+        let allKnownStaff = []; // Halkan ayaan ku keydinaynaa liiska shaqaalaha oo dhan ee staff_users laga keenay
         let rawSales = []; // Dhammaan xogta Database-ka
         let filteredSales = []; // Xogta la shaandheeyay (Time-filtered)
         
@@ -399,7 +400,7 @@
         window.addEventListener('DOMContentLoaded', () => {
             if (localStorage.getItem('controlRoomAdmin') === 'true') {
                 document.getElementById('loginScreen').classList.add('hidden');
-                loadBranchesForFilters();
+                loadInitialData();
             }
         });
 
@@ -407,10 +408,11 @@
 
         document.getElementById('loginForm').addEventListener('submit', (e) => {
             e.preventDefault();
-            if (document.getElementById('adminPassword').value === '4419076') {
+            // PIN-ka laga dhigay 4419 sidii aad codsatay
+            if (document.getElementById('adminPassword').value === '4419') {
                 localStorage.setItem('controlRoomAdmin', 'true');
                 document.getElementById('loginScreen').classList.add('hidden');
-                loadBranchesForFilters();
+                loadInitialData();
             } else {
                 document.getElementById('loginError').classList.remove('hidden');
                 setTimeout(() => document.getElementById('loginError').classList.add('hidden'), 3000);
@@ -536,12 +538,13 @@
         }
 
         // --- Soo akhrinta Data-da ---
-        async function loadBranchesForFilters() {
+        async function loadInitialData() {
             try {
-                const docSnap = await getDocs(collection(db, "branches"));
+                // Fetch Laamaha
+                const branchSnap = await getDocs(collection(db, "branches"));
                 const select = document.getElementById('repFilterBranch');
                 
-                docSnap.forEach(doc => {
+                branchSnap.forEach(doc => {
                     if(doc.id === "2Q0Fwntej1UMUiosOdxs" && doc.data().name) {
                         allKnownBranches = doc.data().name;
                         allKnownBranches.forEach(b => {
@@ -550,6 +553,13 @@
                     }
                 });
                 
+                // Fetch Dhammaan Shaqaalaha ee is-diiwaangeliyay xitaa haddii aysan iib samayn
+                const staffSnap = await getDocs(collection(db, "staff_users"));
+                allKnownStaff = [];
+                staffSnap.forEach(doc => {
+                    allKnownStaff.push({ id: doc.id, ...doc.data() });
+                });
+
                 startLiveMonitoring();
             } catch (e) { console.error(e); }
         }
@@ -589,15 +599,25 @@
             aggregatedBranches = {};
             aggregatedStaff = {};
 
-            // Qari Dhammaan laamaha iyagoo $0 ah (Si aanay meesha uga bixin)
+            // Qari Dhammaan laamaha iyagoo $0 ah
             allKnownBranches.forEach(b => {
                 aggregatedBranches[b] = { revTotal: 0, count: 0, staff: new Set() };
+            });
+
+            // Geli dhammaan shaqaalaha (staff_users) iyagoo $0 ah
+            allKnownStaff.forEach(staff => {
+                // Magaca waa midka loo isticmaalo display
+                aggregatedStaff[staff.name] = { 
+                    rev: 0, 
+                    branch: staff.branch || "Lama Yaqaan", 
+                    count: 0 
+                };
             });
 
             filteredSales.forEach(sale => {
                 const total = parseFloat(sale.total) || 0;
                 const branch = sale.branchName || "Lama Yaqaan";
-                const staff = sale.staffName || "Lama Yaqaan";
+                const staffName = sale.staffName || "Lama Yaqaan";
 
                 if(!aggregatedBranches[branch]) {
                     aggregatedBranches[branch] = { revTotal:0, count:0, staff:new Set() };
@@ -605,11 +625,14 @@
                 
                 aggregatedBranches[branch].revTotal += total;
                 aggregatedBranches[branch].count += 1;
-                aggregatedBranches[branch].staff.add(staff);
+                aggregatedBranches[branch].staff.add(staffName);
 
-                if(!aggregatedStaff[staff]) aggregatedStaff[staff] = { rev:0, branch: branch, count: 0 };
-                aggregatedStaff[staff].rev += total;
-                aggregatedStaff[staff].count += 1;
+                // Haddii shaqaaluhu uusan ku jirin listiga users-ka (tusaale wuxuu iibiyay asoo la tiray), dib u abuur
+                if(!aggregatedStaff[staffName]) {
+                    aggregatedStaff[staffName] = { rev:0, branch: branch, count: 0 };
+                }
+                aggregatedStaff[staffName].rev += total;
+                aggregatedStaff[staffName].count += 1;
             });
         }
 
@@ -739,6 +762,7 @@
         }
 
         function updateStaffPanel() {
+            // Sort by revenue
             const sortedStaff = Object.entries(aggregatedStaff).sort((a,b) => b[1].rev - a[1].rev);
             
             let tableHtml = '';
@@ -748,13 +772,15 @@
                     <tr class="hover:bg-blue-50/50 transition border-b border-slate-100">
                         <td class="p-4 md:p-5 font-black text-slate-900 text-sm md:text-lg flex items-center gap-3 uppercase">
                             <span class="text-slate-400 text-xs w-4">${rank}.</span>
-                            ${name}
+                            <a href="#staff-details/${encodeURIComponent(name)}" class="hover:text-blue-600 transition truncate block max-w-[150px] md:max-w-none" title="${name}">
+                                ${name}
+                            </a>
                         </td>
                         <td class="p-4 md:p-5 text-slate-500 font-bold text-xs md:text-sm uppercase">${data.branch}</td>
                         <td class="p-4 md:p-5 text-right text-emerald-600 font-black text-lg md:text-2xl">${fm(data.rev)}</td>
                         <td class="p-4 md:p-5 text-center">
-                            <a href="#staff-details/${encodeURIComponent(name)}" class="bg-white border border-slate-200 text-blue-600 hover:bg-blue-600 hover:text-white hover:border-blue-600 px-3 py-2 rounded-lg font-bold text-xs md:text-sm transition shadow-sm inline-block">
-                                Arag Xogtiisa
+                            <a href="#staff-details/${encodeURIComponent(name)}" class="bg-white border border-slate-200 text-slate-600 hover:text-blue-600 hover:border-blue-400 px-3 py-1.5 rounded-lg text-xs md:text-sm font-bold shadow-sm transition whitespace-nowrap inline-flex items-center gap-2">
+                                <i class="fa-solid fa-eye"></i> Arag
                             </a>
                         </td>
                     </tr>
@@ -768,12 +794,10 @@
         window.renderStaffDetails = function(staffName) {
             document.getElementById('sd-name').innerText = staffName;
             
+            const staffInfo = aggregatedStaff[staffName] || { branch: "Lama yaqaan", rev: 0, count: 0 };
             const mySales = filteredSales.filter(sale => sale.staffName === staffName);
             
             let totalAmt = 0;
-            let branchName = "Lama yaqaan";
-            if (mySales.length > 0) branchName = mySales[0].branchName; 
-            
             let tableHtml = '';
             mySales.forEach(sale => {
                 totalAmt += parseFloat(sale.total) || 0;
@@ -789,7 +813,7 @@
 
             if(tableHtml === '') tableHtml = `<tr><td colspan="4" class="p-10 text-center font-bold text-slate-400">Wax iib ah ma uusan samaynin muddadan.</td></tr>`;
 
-            document.getElementById('sd-branch').innerText = branchName;
+            document.getElementById('sd-branch').innerText = staffInfo.branch;
             document.getElementById('sd-total-amount').innerText = fm(totalAmt);
             document.getElementById('sd-total-count').innerText = mySales.length;
             document.getElementById('sd-table-body').innerHTML = tableHtml;
